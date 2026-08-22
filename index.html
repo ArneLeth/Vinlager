@@ -63,8 +63,7 @@ h1 {
 
     text-align: center;
 
-    margin:
-        10px 0 5px;
+    margin: 10px 0 5px;
 
     font-size: 30px;
 }
@@ -250,8 +249,7 @@ button {
 
     text-align: center;
 
-    margin:
-        15px 0;
+    margin: 15px 0;
 
     color: #666;
 }
@@ -282,8 +280,7 @@ button {
 
     font-weight: bold;
 
-    margin:
-        10px 0;
+    margin: 10px 0;
 
     letter-spacing: 1px;
 }
@@ -301,11 +298,9 @@ button {
 
     padding: 14px;
 
-    margin:
-        6px 0 14px;
+    margin: 6px 0 14px;
 
-    border:
-        1px solid #ddd;
+    border: 1px solid #ddd;
 
     border-radius: 10px;
 
@@ -350,23 +345,29 @@ button {
 
 
 /* =====================================================
-   STATUS
+   RESPONSIVT
 ===================================================== */
 
-.message {
+@media (max-width: 400px) {
 
-    display: none;
+    .app {
 
-    padding: 12px;
+        padding: 15px;
 
-    margin:
-        10px 0;
+    }
 
-    border-radius: 10px;
+    h1 {
 
-    text-align: center;
+        font-size: 26px;
 
-    background: #e9e9e9;
+    }
+
+    button {
+
+        padding: 15px;
+
+    }
+
 }
 
 </style>
@@ -1197,53 +1198,81 @@ function continueWithBarcode() {
 function resetWineForm() {
 
 
-    document.getElementById(
-        "wineBarcode"
-    ).value =
-        "";
+    const form =
+        document.getElementById(
+            "addPage"
+        );
 
 
-    document.getElementById(
-        "wineName"
-    ).value =
-        "";
+    /*
+       Nulstil alle inputfelter
+    */
+
+    const inputs =
+        form.querySelectorAll(
+            "input"
+        );
 
 
-    document.getElementById(
-        "wineProducer"
-    ).value =
-        "";
+    inputs.forEach(
+        function(input) {
 
 
-    document.getElementById(
-        "wineYear"
-    ).value =
-        "";
+            if (
+                input.type === "file"
+            ) {
 
+                input.value = "";
+
+            }
+
+            else if (
+                input.type === "number"
+            ) {
+
+
+                if (
+                    input.id ===
+                    "wineQuantity"
+                ) {
+
+                    input.value =
+                        "1";
+
+                }
+
+                else {
+
+                    input.value =
+                        "";
+
+                }
+
+            }
+
+            else {
+
+                input.value =
+                    "";
+
+            }
+
+        }
+    );
+
+
+    /*
+       Nulstil dropdown
+    */
 
     document.getElementById(
         "wineType"
-    ).value =
-        "Rødvin";
+    ).selectedIndex = 0;
 
 
-    document.getElementById(
-        "wineCountry"
-    ).value =
-        "";
-
-
-    document.getElementById(
-        "wineQuantity"
-    ).value =
-        "1";
-
-
-    document.getElementById(
-        "wineLocation"
-    ).value =
-        "";
-
+    /*
+       Nulstil noter
+    */
 
     document.getElementById(
         "wineNotes"
@@ -1251,11 +1280,9 @@ function resetWineForm() {
         "";
 
 
-    document.getElementById(
-        "winePhoto"
-    ).value =
-        "";
-
+    /*
+       Fjern billedpreview
+    */
 
     const preview =
         document.getElementById(
@@ -1263,12 +1290,23 @@ function resetWineForm() {
         );
 
 
-    preview.src =
-        "";
+    preview.removeAttribute(
+        "src"
+    );
 
 
     preview.style.display =
         "none";
+
+
+    /*
+       Fjern valgt billedfil
+    */
+
+    document.getElementById(
+        "winePhoto"
+    ).value =
+        "";
 
 }
 
@@ -1280,8 +1318,9 @@ function resetWineForm() {
 function showAddForm(code) {
 
 
-    resetWineForm();
-
+    /*
+       Skjul andre sider
+    */
 
     document.getElementById(
         "homePage"
@@ -1307,10 +1346,26 @@ function showAddForm(code) {
         "block";
 
 
-    document.getElementById(
-        "wineBarcode"
-    ).value =
-        code || "";
+    /*
+       Nulstil formularen
+    */
+
+    resetWineForm();
+
+
+    /*
+       Indsæt stregkode
+       EFTER reset
+    */
+
+    if (code) {
+
+        document.getElementById(
+            "wineBarcode"
+        ).value =
+            code;
+
+    }
 
 }
 
@@ -1437,7 +1492,8 @@ function saveWine() {
 
 
     /*
-       Nulstil alt efter gemning.
+       Formularen nulstilles
+       inden vi går tilbage.
     */
 
     resetWineForm();
@@ -1481,17 +1537,10 @@ function showHome() {
     ).style.display =
         "none";
 
-
-    /*
-       Sørg for at næste
-       "Tilføj vin" starter rent.
-    */
-
-    resetWineForm();
-
 }
 
 </script>
+
 
 </body>
 
