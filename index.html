@@ -2,25 +2,39 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Vinlager">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="apple-mobile-web-app-capable"
+      content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+      content="default">
+
+<meta name="apple-mobile-web-app-title"
+      content="Vinlager">
 
 <title>Mit Vinlager</title>
 
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #f7f5f2;
     color: #222;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
 .app {
@@ -35,6 +49,10 @@ h1 {
     font-size: 30px;
 }
 
+h2 {
+    margin-top: 5px;
+}
+
 .subtitle {
     text-align: center;
     color: #777;
@@ -45,17 +63,23 @@ button {
     width: 100%;
     border: none;
     border-radius: 14px;
+
     padding: 17px;
     margin: 7px 0;
+
     font-size: 17px;
     font-weight: 600;
+
     background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
 }
 
 .scan {
     font-size: 20px;
     padding: 22px;
+
     background: #222;
     color: white;
 }
@@ -70,48 +94,110 @@ button {
     color: #888;
 }
 
-#scanner {
+
+/* =========================
+   SCANNER
+========================= */
+
+#scannerPage {
     display: none;
-    margin-top: 20px;
-    background: white;
-    border-radius: 16px;
-    padding: 10px;
+}
+
+#camera {
+    position: relative;
+    width: 100%;
+
     overflow: hidden;
+
+    border-radius: 16px;
+
+    background: black;
 }
 
-.scanner-controls {
-    display: none;
+#camera video {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
-#result {
-    display: none;
-    margin-top: 15px;
-    padding: 15px;
-    background: white;
-    border-radius: 14px;
+#camera canvas.drawingBuffer {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+}
+
+.scanbox {
+    position: absolute;
+
+    top: 35%;
+    left: 5%;
+
+    width: 90%;
+    height: 30%;
+
+    border:
+        3px solid white;
+
+    border-radius: 8px;
+
+    pointer-events: none;
+
+    box-shadow:
+        0 0 0 9999px
+        rgba(0,0,0,.20);
+}
+
+.scanline {
+    position: absolute;
+
+    top: 50%;
+    left: 5%;
+
+    width: 90%;
+    height: 2px;
+
+    background: red;
+
+    pointer-events: none;
+}
+
+.scanner-info {
     text-align: center;
+
+    margin:
+        15px 0;
+
+    color: #666;
 }
 
-.barcode {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 10px 0;
-}
 
-.form {
+/* =========================
+   FORM
+========================= */
+
+#addPage {
     display: none;
-    margin-top: 20px;
 }
 
 .form input,
 .form select,
 .form textarea {
+
     width: 100%;
+
     padding: 14px;
-    margin: 6px 0 14px;
-    border: 1px solid #ddd;
+
+    margin:
+        6px 0 14px;
+
+    border:
+        1px solid #ddd;
+
     border-radius: 10px;
+
     font-size: 16px;
+
     background: white;
 }
 
@@ -127,12 +213,82 @@ button {
 .back {
     background: #ddd;
 }
+
+
+/* =========================
+   PHOTO
+========================= */
+
+.photo-section {
+
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+#photoPreview {
+
+    width: 100%;
+
+    max-height: 300px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    display: none;
+
+    background: #eee;
+}
+
+.photo-button {
+
+    background: white;
+}
+
+
+/* =========================
+   RESULT
+========================= */
+
+#scanResult {
+
+    display: none;
+
+    margin-top: 15px;
+
+    padding: 15px;
+
+    background: white;
+
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.barcode {
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin:
+        10px 0;
+}
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
+
+
+<!-- =========================
+     FORSIDE
+========================= -->
+
+<div id="homePage">
 
     <h1>🍷 Mit Vinlager</h1>
 
@@ -140,221 +296,598 @@ button {
         Dit private vinlager
     </div>
 
-    <div id="mainMenu">
 
-        <button class="scan" onclick="startScanner()">
-            📷 Scan vin
-        </button>
+    <button
+        class="scan"
+        onclick="startScanner()">
 
-        <button onclick="showAddForm()">
-            ➕ Tilføj vin
-        </button>
+        📷 Scan vin
 
-        <button>
-            🔎 Søg i vinlager
-        </button>
+    </button>
 
-        <br>
 
-        <button class="category">
+    <button
+        onclick="showAddForm('')">
+
+        ➕ Tilføj vin
+
+    </button>
+
+
+    <button>
+
+        🔎 Søg i vinlager
+
+    </button>
+
+
+    <br>
+
+
+    <button class="category">
+
+        🍷 Rødvin
+
+        <span class="count">0</span>
+
+    </button>
+
+
+    <button class="category">
+
+        🥂 Hvidvin
+
+        <span class="count">0</span>
+
+    </button>
+
+
+    <button class="category">
+
+        🫧 Mousserende
+
+        <span class="count">0</span>
+
+    </button>
+
+
+    <button class="category">
+
+        🍾 Champagne
+
+        <span class="count">0</span>
+
+    </button>
+
+
+    <button class="category">
+
+        🍷 Portvin
+
+        <span class="count">0</span>
+
+    </button>
+
+
+    <button class="category">
+
+        🥃 Spiritus
+
+        <span class="count">0</span>
+
+    </button>
+
+</div>
+
+
+<!-- =========================
+     SCANNER
+========================= -->
+
+<div id="scannerPage">
+
+    <h2>📷 Scan vin</h2>
+
+    <div class="scanner-info">
+
+        Placer stregkoden
+        inden for rammen
+
+    </div>
+
+
+    <div id="camera">
+
+        <div class="scanbox"></div>
+
+        <div class="scanline"></div>
+
+    </div>
+
+
+    <div
+        id="scannerStatus"
+        class="scanner-info">
+
+        Starter kamera…
+
+    </div>
+
+
+    <button
+        onclick="closeScanner()"
+        class="back">
+
+        ← Luk scanner
+
+    </button>
+
+</div>
+
+
+<!-- =========================
+     SCAN RESULTAT
+========================= -->
+
+<div id="scanResult">
+
+    <div>
+        Stregkode fundet
+    </div>
+
+
+    <div
+        id="barcode"
+        class="barcode">
+    </div>
+
+
+    <button
+        onclick="continueWithBarcode()">
+
+        ➕ Tilføj denne vin
+
+    </button>
+
+</div>
+
+
+<!-- =========================
+     TILFØJ VIN
+========================= -->
+
+<div
+    id="addPage"
+    class="form">
+
+    <h2>➕ Tilføj vin</h2>
+
+
+    <label>
+        Stregkode
+    </label>
+
+    <input
+        id="wineBarcode"
+        type="text"
+        inputmode="numeric">
+
+
+    <label>
+        Navn
+    </label>
+
+    <input
+        id="wineName"
+        type="text"
+        placeholder="Vinens navn">
+
+
+    <label>
+        Producent
+    </label>
+
+    <input
+        id="wineProducer"
+        type="text"
+        placeholder="Producent">
+
+
+    <label>
+        Årgang
+    </label>
+
+    <input
+        id="wineYear"
+        type="number"
+        placeholder="Fx 2020">
+
+
+    <label>
+        Type
+    </label>
+
+    <select id="wineType">
+
+        <option value="Rødvin">
             🍷 Rødvin
-            <span class="count">0</span>
-        </button>
+        </option>
 
-        <button class="category">
+        <option value="Hvidvin">
             🥂 Hvidvin
-            <span class="count">0</span>
-        </button>
+        </option>
 
-        <button class="category">
+        <option value="Mousserende">
             🫧 Mousserende
-            <span class="count">0</span>
-        </button>
+        </option>
 
-        <button class="category">
+        <option value="Champagne">
             🍾 Champagne
-            <span class="count">0</span>
-        </button>
+        </option>
 
-        <button class="category">
+        <option value="Portvin">
             🍷 Portvin
-            <span class="count">0</span>
-        </button>
+        </option>
 
-        <button class="category">
+        <option value="Spiritus">
             🥃 Spiritus
-            <span class="count">0</span>
-        </button>
+        </option>
+
+    </select>
+
+
+    <label>
+        Land
+    </label>
+
+    <input
+        id="wineCountry"
+        type="text"
+        placeholder="Fx Italien">
+
+
+    <label>
+        Antal
+    </label>
+
+    <input
+        id="wineQuantity"
+        type="number"
+        value="1"
+        min="1">
+
+
+    <label>
+        Placering
+    </label>
+
+    <input
+        id="wineLocation"
+        type="text"
+        placeholder="Fx Reol 2, hylde 3">
+
+
+    <!-- FOTO -->
+
+    <div class="photo-section">
+
+        <label>
+            📸 Billede af etiketten
+        </label>
+
+        <input
+            id="winePhoto"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onchange="previewPhoto(event)">
+
+        <img
+            id="photoPreview">
 
     </div>
 
 
-    <!-- SCANNER -->
+    <label>
+        Noter
+    </label>
 
-    <div id="scanner"></div>
-
-    <div class="scanner-controls" id="scannerControls">
-
-        <button onclick="stopScanner()" class="back">
-            ← Luk scanner
-        </button>
-
-    </div>
+    <textarea
+        id="wineNotes"
+        rows="4"
+        placeholder="Dine egne noter">
+    </textarea>
 
 
-    <!-- RESULTAT -->
+    <button
+        class="save"
+        onclick="saveWine()">
 
-    <div id="result">
+        💾 Gem vin
 
-        <div>Stregkode fundet</div>
-
-        <div class="barcode" id="barcode"></div>
-
-        <button onclick="addScannedWine()">
-            ➕ Tilføj denne vin
-        </button>
-
-    </div>
+    </button>
 
 
-    <!-- TILFØJ VIN -->
+    <button
+        class="back"
+        onclick="showHome()">
 
-    <div class="form" id="addForm">
+        ← Tilbage
 
-        <h2>➕ Tilføj vin</h2>
+    </button>
 
-        <label>Stregkode</label>
-        <input id="wineBarcode" type="text" inputmode="numeric">
-
-        <label>Navn</label>
-        <input id="wineName" type="text" placeholder="Vinens navn">
-
-        <label>Producent</label>
-        <input id="wineProducer" type="text" placeholder="Producent">
-
-        <label>Årgang</label>
-        <input id="wineYear" type="number" placeholder="Fx 2020">
-
-        <label>Type</label>
-        <select id="wineType">
-            <option value="Rødvin">🍷 Rødvin</option>
-            <option value="Hvidvin">🥂 Hvidvin</option>
-            <option value="Mousserende">🫧 Mousserende</option>
-            <option value="Champagne">🍾 Champagne</option>
-            <option value="Portvin">🍷 Portvin</option>
-            <option value="Spiritus">🥃 Spiritus</option>
-        </select>
-
-        <label>Land</label>
-        <input id="wineCountry" type="text" placeholder="Fx Italien">
-
-        <label>Antal</label>
-        <input id="wineQuantity" type="number" value="1" min="1">
-
-        <label>Placering</label>
-        <input id="wineLocation" type="text" placeholder="Fx Reol 2, hylde 3">
-
-        <label>Noter</label>
-        <textarea id="wineNotes" rows="4"
-            placeholder="Dine egne noter"></textarea>
-
-        <button class="save" onclick="saveWine()">
-            💾 Gem vin
-        </button>
-
-        <button class="back" onclick="showMain()">
-            ← Tilbage
-        </button>
-
-    </div>
+</div>
 
 </div>
 
 
 <script>
 
-let scanner = null;
+let scannerRunning = false;
+
+let lastCode = "";
+
+let detectionCount = 0;
+
+const REQUIRED_DETECTIONS = 2;
 
 
 /* =========================
-   SCANNER
+   START SCANNER
 ========================= */
 
 function startScanner() {
 
-    document.getElementById("mainMenu").style.display = "none";
-    document.getElementById("scanner").style.display = "block";
-    document.getElementById("scannerControls").style.display = "block";
-    document.getElementById("result").style.display = "none";
+    document.getElementById(
+        "homePage"
+    ).style.display = "none";
 
-    scanner = new Html5Qrcode("scanner");
+
+    document.getElementById(
+        "addPage"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "scannerPage"
+    ).style.display = "block";
+
+
+    lastCode = "";
+
+    detectionCount = 0;
+
 
     const config = {
 
-        fps: 15,
+        inputStream: {
 
-        qrbox: {
-            width: 320,
-            height: 160
+            name: "Live",
+
+            type: "LiveStream",
+
+            target:
+                document.querySelector("#camera"),
+
+
+            constraints: {
+
+                width: {
+                    min: 640,
+                    ideal: 1920
+                },
+
+                height: {
+                    min: 480,
+                    ideal: 1080
+                },
+
+                facingMode: {
+                    ideal: "environment"
+                },
+
+                aspectRatio: {
+                    ideal: 16 / 9
+                },
+
+                focusMode:
+                    "continuous"
+
+            },
+
+
+            area: {
+
+                top: "25%",
+
+                right: "5%",
+
+                left: "5%",
+
+                bottom: "25%"
+
+            }
+
         },
 
-        aspectRatio: 1.7777778,
 
-        formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E
-        ]
+        locator: {
+
+            patchSize:
+                "medium",
+
+            halfSample:
+                true
+
+        },
+
+
+        frequency:
+            15,
+
+
+        decoder: {
+
+            readers: [
+
+                "ean_reader",
+
+                "ean_8_reader"
+
+            ]
+
+        },
+
+
+        locate:
+            true,
+
+
+        numOfWorkers:
+            navigator.hardwareConcurrency
+            ? Math.min(
+                navigator.hardwareConcurrency,
+                4
+              )
+            : 2
 
     };
 
 
-    scanner.start(
-
-        {
-            facingMode: {
-                exact: "environment"
-            }
-        },
+    Quagga.init(
 
         config,
 
-        function(decodedText) {
+        function(error) {
 
-            document.getElementById("barcode").textContent =
-                decodedText;
+            if (error) {
 
-            document.getElementById("result").style.display =
-                "block";
+                console.error(error);
 
-            scanner.stop().then(function() {
+                document.getElementById(
+                    "scannerStatus"
+                ).textContent =
+                    "Kameraet kunne ikke startes.";
 
-                document.getElementById("scanner").style.display =
-                    "none";
+                return;
 
-                document.getElementById("scannerControls").style.display =
-                    "none";
+            }
 
-            });
 
-        },
+            Quagga.start();
 
-        function(errorMessage) {
+            scannerRunning = true;
 
-            // Scanner leder hele tiden.
-            // Derfor viser vi ikke fejlbeskeder.
+
+            document.getElementById(
+                "scannerStatus"
+            ).textContent =
+                "Scanner…";
+
+
+            Quagga.onDetected(
+                barcodeDetected
+            );
 
         }
 
-    ).catch(function(error) {
+    );
 
-        alert(
-            "Kameraet kunne ikke startes.\n\n" +
-            "Kontroller at kameraadgang er tilladt."
-        );
+}
 
-    });
+
+/* =========================
+   DETECTION
+========================= */
+
+function barcodeDetected(result) {
+
+    if (
+        !result ||
+        !result.codeResult ||
+        !result.codeResult.code
+    ) {
+        return;
+    }
+
+
+    const code =
+        result.codeResult.code;
+
+
+    const format =
+        result.codeResult.format;
+
+
+    if (
+        format !== "ean_13" &&
+        format !== "ean_8"
+    ) {
+        return;
+    }
+
+
+    if (code === lastCode) {
+
+        detectionCount++;
+
+    } else {
+
+        lastCode = code;
+
+        detectionCount = 1;
+
+    }
+
+
+    document.getElementById(
+        "scannerStatus"
+    ).textContent =
+        "EAN fundet – bekræfter…";
+
+
+    if (
+        detectionCount >=
+        REQUIRED_DETECTIONS
+    ) {
+
+        finishScan(code);
+
+    }
+
+}
+
+
+/* =========================
+   FINISH SCAN
+========================= */
+
+function finishScan(code) {
+
+    stopScanner();
+
+
+    document.getElementById(
+        "barcode"
+    ).textContent =
+        code;
+
+
+    document.getElementById(
+        "scannerPage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
+        "block";
 
 }
 
@@ -365,95 +898,148 @@ function startScanner() {
 
 function stopScanner() {
 
-    if (scanner) {
+    if (!scannerRunning) {
+        return;
+    }
 
-        scanner.stop().then(function() {
 
-            scanner.clear();
+    try {
 
-            scanner = null;
+        Quagga.offDetected(
+            barcodeDetected
+        );
 
-            document.getElementById("scanner").style.display =
-                "none";
+        Quagga.stop();
 
-            document.getElementById("scannerControls").style.display =
-                "none";
+    } catch (e) {
 
-            document.getElementById("mainMenu").style.display =
-                "block";
-
-        });
-
-    } else {
-
-        showMain();
+        console.log(e);
 
     }
 
-}
 
-
-/* =========================
-   SCANNET VIN
-========================= */
-
-function addScannedWine() {
-
-    const barcode =
-        document.getElementById("barcode").textContent;
-
-    showAddForm();
-
-    document.getElementById("wineBarcode").value =
-        barcode;
+    scannerRunning = false;
 
 }
 
 
 /* =========================
-   TILFØJ VIN MANUELT
+   CLOSE SCANNER
 ========================= */
 
-function showAddForm() {
+function closeScanner() {
 
-    document.getElementById("mainMenu").style.display =
+    stopScanner();
+
+
+    document.getElementById(
+        "scannerPage"
+    ).style.display =
         "none";
 
-    document.getElementById("result").style.display =
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
         "none";
 
-    document.getElementById("scanner").style.display =
-        "none";
 
-    document.getElementById("scannerControls").style.display =
-        "none";
-
-    document.getElementById("addForm").style.display =
+    document.getElementById(
+        "homePage"
+    ).style.display =
         "block";
 
 }
 
 
 /* =========================
-   TILBAGE
+   CONTINUE WITH BARCODE
 ========================= */
 
-function showMain() {
+function continueWithBarcode() {
 
-    document.getElementById("mainMenu").style.display =
-        "block";
+    const code =
+        document.getElementById(
+            "barcode"
+        ).textContent;
 
-    document.getElementById("addForm").style.display =
-        "none";
 
-    document.getElementById("result").style.display =
-        "none";
+    showAddForm(code);
 
 }
 
 
 /* =========================
-   GEM VIN
+   ADD FORM
+========================= */
+
+function showAddForm(code) {
+
+    document.getElementById(
+        "homePage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "scannerPage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "addPage"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "wineBarcode"
+    ).value =
+        code || "";
+
+}
+
+
+/* =========================
+   PHOTO PREVIEW
+========================= */
+
+function previewPhoto(event) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    const image =
+        document.getElementById(
+            "photoPreview"
+        );
+
+
+    image.src =
+        URL.createObjectURL(file);
+
+
+    image.style.display =
+        "block";
+
+}
+
+
+/* =========================
+   SAVE TEST
 ========================= */
 
 function saveWine() {
@@ -461,31 +1047,49 @@ function saveWine() {
     const wine = {
 
         barcode:
-            document.getElementById("wineBarcode").value,
+            document.getElementById(
+                "wineBarcode"
+            ).value,
 
         name:
-            document.getElementById("wineName").value,
+            document.getElementById(
+                "wineName"
+            ).value,
 
         producer:
-            document.getElementById("wineProducer").value,
+            document.getElementById(
+                "wineProducer"
+            ).value,
 
         year:
-            document.getElementById("wineYear").value,
+            document.getElementById(
+                "wineYear"
+            ).value,
 
         type:
-            document.getElementById("wineType").value,
+            document.getElementById(
+                "wineType"
+            ).value,
 
         country:
-            document.getElementById("wineCountry").value,
+            document.getElementById(
+                "wineCountry"
+            ).value,
 
         quantity:
-            document.getElementById("wineQuantity").value,
+            document.getElementById(
+                "wineQuantity"
+            ).value,
 
         location:
-            document.getElementById("wineLocation").value,
+            document.getElementById(
+                "wineLocation"
+            ).value,
 
         notes:
-            document.getElementById("wineNotes").value
+            document.getElementById(
+                "wineNotes"
+            ).value
 
     };
 
@@ -501,7 +1105,42 @@ function saveWine() {
     );
 
 
-    showMain();
+    showHome();
+
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function showHome() {
+
+    stopScanner();
+
+
+    document.getElementById(
+        "homePage"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "scannerPage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "scanResult"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "addPage"
+    ).style.display =
+        "none";
 
 }
 
