@@ -1,2 +1,2 @@
 # Vinlager
-Orivat vinlager til iphone
+Privat vinlager til iphone
