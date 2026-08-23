@@ -19,9 +19,6 @@
 
 <title>Mit Vinlager</title>
 
-
-<!-- Quagga2 - stregkodescanner -->
-
 <script src="https://unpkg.com/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
 
 
@@ -163,8 +160,10 @@ button {
 
 .scanbox {
     position: absolute;
+
     top: 35%;
     left: 5%;
+
     width: 90%;
     height: 30%;
 
@@ -182,8 +181,10 @@ button {
 
 .scanline {
     position: absolute;
+
     top: 50%;
     left: 5%;
+
     width: 90%;
     height: 2px;
 
@@ -205,16 +206,22 @@ button {
 
 #scanResult {
     margin-top: 15px;
+
     padding: 20px;
+
     background: white;
+
     border-radius: 14px;
+
     text-align: center;
 }
 
 .barcode {
     font-size: 21px;
     font-weight: bold;
+
     margin: 12px 0;
+
     letter-spacing: 1px;
 }
 
@@ -226,10 +233,13 @@ button {
 .lookupStatus {
     padding: 14px;
     margin: 12px 0;
+
     border-radius: 12px;
+
     text-align: center;
 
     background: #f1f1f1;
+
     color: #555;
 
     font-size: 15px;
@@ -245,11 +255,6 @@ button {
     color: #745b00;
 }
 
-.lookupError {
-    background: #f8d7da;
-    color: #842029;
-}
-
 
 /* =====================================================
    FORMULAR
@@ -258,14 +263,19 @@ button {
 .form input,
 .form select,
 .form textarea {
+
     width: 100%;
+
     padding: 14px;
+
     margin: 6px 0 14px;
 
     border: 1px solid #ddd;
+
     border-radius: 10px;
 
     font-size: 16px;
+
     background: white;
 }
 
@@ -284,7 +294,9 @@ button {
 }
 
 #photoPreview {
+
     width: 100%;
+
     max-height: 300px;
 
     object-fit: contain;
@@ -336,11 +348,9 @@ button {
 
 <div id="homePage">
 
-
     <h1>
         🍷 Mit Vinlager
     </h1>
-
 
     <div class="subtitle">
         Dit private vinlager
@@ -439,7 +449,6 @@ button {
 
     </button>
 
-
 </div>
 
 
@@ -448,7 +457,6 @@ button {
 =================================================== -->
 
 <div id="scannerPage">
-
 
     <h2>
         📷 Scan vin
@@ -489,7 +497,6 @@ button {
 
     </button>
 
-
 </div>
 
 
@@ -498,7 +505,6 @@ button {
 =================================================== -->
 
 <div id="scanResult">
-
 
     <div>
         Stregkode fundet
@@ -521,7 +527,6 @@ button {
 
 
     <button
-        id="addFoundWineButton"
         onclick="continueWithBarcode()">
 
         ➕ Tilføj denne vin
@@ -536,7 +541,6 @@ button {
         📷 Scan igen
 
     </button>
-
 
 </div>
 
@@ -718,7 +722,6 @@ button {
 
     </button>
 
-
 </div>
 
 
@@ -742,7 +745,7 @@ const REQUIRED_DETECTIONS = 2;
 
 
 /* =====================================================
-   OPSLAGSDATA
+   VIN DATA FRA OPSLAG
 ===================================================== */
 
 let lookupWineData = null;
@@ -753,7 +756,6 @@ let lookupWineData = null;
 ===================================================== */
 
 function startScanner() {
-
 
     document.getElementById(
         "homePage"
@@ -787,7 +789,6 @@ function startScanner() {
 
 
     const config = {
-
 
         inputStream: {
 
@@ -857,8 +858,11 @@ function startScanner() {
         decoder: {
 
             readers: [
+
                 "ean_reader",
+
                 "ean_8_reader"
+
             ]
 
         },
@@ -885,17 +889,14 @@ function startScanner() {
 
         function(error) {
 
-
             if (error) {
 
                 console.error(error);
-
 
                 document.getElementById(
                     "scannerStatus"
                 ).textContent =
                     "Kameraet kunne ikke startes.";
-
 
                 return;
 
@@ -903,7 +904,6 @@ function startScanner() {
 
 
             Quagga.start();
-
 
             scannerRunning = true;
 
@@ -931,13 +931,14 @@ function startScanner() {
 
 function barcodeDetected(result) {
 
-
     if (
         !result ||
         !result.codeResult ||
         !result.codeResult.code
     ) {
+
         return;
+
     }
 
 
@@ -953,7 +954,9 @@ function barcodeDetected(result) {
         format !== "ean_13" &&
         format !== "ean_8"
     ) {
+
         return;
+
     }
 
 
@@ -961,7 +964,9 @@ function barcodeDetected(result) {
 
         detectionCount++;
 
-    } else {
+    }
+
+    else {
 
         lastCode = code;
 
@@ -994,7 +999,6 @@ function barcodeDetected(result) {
 
 function finishScan(code) {
 
-
     stopScanner();
 
 
@@ -1026,7 +1030,6 @@ function finishScan(code) {
 ===================================================== */
 
 function stopScanner() {
-
 
     if (!scannerRunning) {
         return;
@@ -1061,7 +1064,6 @@ function stopScanner() {
 
 function closeScanner() {
 
-
     stopScanner();
 
 
@@ -1088,7 +1090,6 @@ function closeScanner() {
 
 function scanAgain() {
 
-
     lookupWineData = null;
 
 
@@ -1103,11 +1104,10 @@ function scanAgain() {
 
 
 /* =====================================================
-   AUTOMATISK VINOPSLAG
+   OPEN FOOD FACTS OPSLAG
 ===================================================== */
 
 async function lookupWine(code) {
-
 
     const status =
         document.getElementById(
@@ -1124,9 +1124,10 @@ async function lookupWine(code) {
 
 
     /*
-       Vi bruger den aktuelle v3 API.
+       Open Food Facts v3
 
-       Kun nødvendige felter hentes.
+       Vi henter kun de oplysninger,
+       vi har brug for.
     */
 
     const fields = [
@@ -1156,53 +1157,17 @@ async function lookupWine(code) {
         + encodeURIComponent(fields);
 
 
-    console.log(
-        "Open Food Facts URL:",
-        url
-    );
-
-
     try {
 
-
         const response =
-            await fetch(
-                url,
-                {
-                    method: "GET"
-                }
-            );
+            await fetch(url);
 
 
-        console.log(
-            "API HTTP status:",
-            response.status
-        );
-
+        /*
+           HTTP-fejl
+        */
 
         if (!response.ok) {
-
-            if (
-                response.status === 404
-            ) {
-
-                lookupWineData = null;
-
-
-                status.className =
-                    "lookupStatus lookupWarning";
-
-
-                status.textContent =
-                    "⚠️ Stregkoden findes ikke "
-                    + "i databasen. Du kan indtaste "
-                    + "vinen manuelt.";
-
-
-                return;
-
-            }
-
 
             throw new Error(
                 "HTTP " +
@@ -1216,23 +1181,13 @@ async function lookupWine(code) {
             await response.json();
 
 
-        console.log(
-            "Open Food Facts svar:",
-            data
-        );
-
-
         /*
-           V3 bruger product-objektet,
-           og status kan være success.
+           Produkt ikke fundet
         */
 
-        const product =
-            data.product;
-
-
         if (
-            !product
+            data.status !== 1 ||
+            !data.product
         ) {
 
             lookupWineData = null;
@@ -1244,19 +1199,21 @@ async function lookupWine(code) {
 
             status.textContent =
                 "⚠️ Vinen blev ikke fundet "
-                + "i databasen.";
-
+                + "automatisk. "
+                + "Du kan indtaste oplysningerne "
+                + "manuelt.";
 
             return;
 
         }
 
 
-        /*
-           Hent navn.
+        const product =
+            data.product;
 
-           Vi prioriterer dansk,
-           derefter almindeligt navn.
+
+        /*
+           Navn
         */
 
         const name =
@@ -1285,9 +1242,7 @@ async function lookupWine(code) {
         */
 
         const country =
-            extractCountry(
-                product
-            );
+            extractCountry(product);
 
 
         /*
@@ -1295,26 +1250,28 @@ async function lookupWine(code) {
         */
 
         const type =
-            detectWineType(
-                product
-            );
+            detectWineType(product);
 
 
         lookupWineData = {
 
-            name: name,
+            name:
+                name,
 
-            producer: producer,
+            producer:
+                producer,
 
-            country: country,
+            country:
+                country,
 
-            type: type
+            type:
+                type
 
         };
 
 
         /*
-           Vis succes
+           Vis resultat
         */
 
         status.className =
@@ -1324,28 +1281,27 @@ async function lookupWine(code) {
         if (name) {
 
             status.textContent =
-                "✅ Vin fundet: "
-                + name
-                + ". Kontrollér oplysningerne "
+                "✅ Vin fundet automatisk. "
+                + "Kontrollér oplysningerne "
                 + "før du gemmer.";
-
-        } else {
-
-            status.textContent =
-                "✅ Stregkoden blev fundet, "
-                + "men der mangler vinoplysninger. "
-                + "Kontrollér formularen.";
 
         }
 
+        else {
+
+            status.textContent =
+                "✅ Stregkoden blev fundet, "
+                + "men der mangler oplysninger. "
+                + "Kontrollér formularen.";
+
+        }
 
     }
 
     catch (error) {
 
-
         console.error(
-            "Vinopslag fejlede:",
+            "Open Food Facts fejl:",
             error
         );
 
@@ -1353,15 +1309,22 @@ async function lookupWine(code) {
         lookupWineData = null;
 
 
+        /*
+           Vi viser ikke en teknisk fejl
+           til brugeren.
+
+           Brugeren kan stadig
+           indtaste vinen.
+        */
+
         status.className =
-            "lookupStatus lookupError";
+            "lookupStatus lookupWarning";
 
 
         status.textContent =
-            "⚠️ Kunne ikke kontakte "
-            + "vin-databasen. "
-            + "Du kan stadig indtaste "
-            + "vinen manuelt.";
+            "⚠️ Der blev ikke fundet "
+            + "automatiske oplysninger. "
+            + "Indtast vinen manuelt.";
 
     }
 
@@ -1374,11 +1337,6 @@ async function lookupWine(code) {
 
 function extractCountry(product) {
 
-
-    /*
-       Først countries_tags
-    */
-
     if (
         Array.isArray(
             product.countries_tags
@@ -1387,24 +1345,14 @@ function extractCountry(product) {
         product.countries_tags.length
     ) {
 
-        const country =
-            product.countries_tags[0];
-
-
         return cleanTaxonomyValue(
-            country
+            product.countries_tags[0]
         );
 
     }
 
 
-    /*
-       Derefter countries
-    */
-
-    if (
-        product.countries
-    ) {
+    if (product.countries) {
 
         return product.countries
             .split(",")[0]
@@ -1413,13 +1361,7 @@ function extractCountry(product) {
     }
 
 
-    /*
-       Til sidst origins
-    */
-
-    if (
-        product.origins
-    ) {
+    if (product.origins) {
 
         return product.origins
             .split(",")[0]
@@ -1434,32 +1376,21 @@ function extractCountry(product) {
 
 
 /* =====================================================
-   RENS OPEN FOOD FACTS TAXONOMI
+   RENS TAXONOMI
 ===================================================== */
 
 function cleanTaxonomyValue(value) {
-
 
     if (!value) {
         return "";
     }
 
 
-    /*
-       Eksempel:
-
-       en:france
-       da:frankrig
-       fr:france
-    */
-
     const parts =
         value.split(":");
 
 
-    if (
-        parts.length > 1
-    ) {
+    if (parts.length > 1) {
 
         return parts
             .slice(1)
@@ -1480,7 +1411,6 @@ function cleanTaxonomyValue(value) {
 ===================================================== */
 
 function detectWineType(product) {
-
 
     const text = (
 
@@ -1619,6 +1549,8 @@ function detectWineType(product) {
         text.includes("liqueur")
         ||
         text.includes("likør")
+        ||
+        text.includes("limoncello")
 
     ) {
 
@@ -1680,7 +1612,7 @@ function detectWineType(product) {
 
 
     /*
-       Hvis vi ikke kan bestemme typen
+       Standard
     */
 
     return "Rødvin";
@@ -1693,7 +1625,6 @@ function detectWineType(product) {
 ===================================================== */
 
 function continueWithBarcode() {
-
 
     const code =
         document.getElementById(
@@ -1710,11 +1641,10 @@ function continueWithBarcode() {
 
 
 /* =====================================================
-   RESET VINFORMULAR
+   RESET FORMULAR
 ===================================================== */
 
 function resetWineForm() {
-
 
     const form =
         document.getElementById(
@@ -1731,7 +1661,6 @@ function resetWineForm() {
     inputs.forEach(
         function(input) {
 
-
             if (
                 input.type === "file"
             ) {
@@ -1743,7 +1672,6 @@ function resetWineForm() {
             else if (
                 input.type === "number"
             ) {
-
 
                 if (
                     input.id ===
@@ -1793,8 +1721,7 @@ function resetWineForm() {
     );
 
 
-    preview.style.display =
-        "none";
+    preview.style.display = "none";
 
 
     document.getElementById(
@@ -1802,28 +1729,21 @@ function resetWineForm() {
     ).value = "";
 
 
-    const formStatus =
+    const status =
         document.getElementById(
             "formLookupStatus"
         );
 
 
-    formStatus.style.display =
-        "none";
+    status.style.display = "none";
 
-
-    formStatus.textContent =
-        "";
-
-
-    formStatus.className =
-        "lookupStatus";
+    status.textContent = "";
 
 }
 
 
 /* =====================================================
-   VIS TILFØJ VIN
+   VIS FORMULAR
 ===================================================== */
 
 function showAddForm(
@@ -1831,30 +1751,30 @@ function showAddForm(
     wineData
 ) {
 
-
     document.getElementById(
         "homePage"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
     document.getElementById(
         "scannerPage"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
     document.getElementById(
         "scanResult"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
     document.getElementById(
         "addPage"
-    ).style.display =
-        "block";
+    ).style.display = "block";
 
+
+    /*
+       Vigtigt:
+       reset før nye data indsættes.
+    */
 
     resetWineForm();
 
@@ -1867,18 +1787,16 @@ function showAddForm(
 
         document.getElementById(
             "wineBarcode"
-        ).value =
-            code;
+        ).value = code;
 
     }
 
 
     /*
-       Automatisk fundne data
+       Automatiske oplysninger
     */
 
     if (wineData) {
-
 
         document.getElementById(
             "wineName"
@@ -1910,8 +1828,7 @@ function showAddForm(
             );
 
 
-        status.style.display =
-            "block";
+        status.style.display = "block";
 
 
         status.className =
@@ -1933,7 +1850,6 @@ function showAddForm(
 
 function previewPhoto(event) {
 
-
     const file =
         event.target.files[0];
 
@@ -1950,9 +1866,7 @@ function previewPhoto(event) {
 
 
     image.src =
-        URL.createObjectURL(
-            file
-        );
+        URL.createObjectURL(file);
 
 
     image.style.display =
@@ -1966,7 +1880,6 @@ function previewPhoto(event) {
 ===================================================== */
 
 function saveWine() {
-
 
     const wine = {
 
@@ -2019,8 +1932,10 @@ function saveWine() {
 
 
     /*
-       Midlertidig testlagring.
-       OneDrive kommer senere.
+       Midlertidig lokal testlagring.
+
+       Denne del erstatter vi med
+       OneDrive i næste trin.
     */
 
     localStorage.setItem(
@@ -2034,6 +1949,10 @@ function saveWine() {
     );
 
 
+    /*
+       Reset efter gemning
+    */
+
     resetWineForm();
 
 
@@ -2043,46 +1962,39 @@ function saveWine() {
 
 
 /* =====================================================
-   TILBAGE TIL FORSIDE
+   FORSIDE
 ===================================================== */
 
 function showHome() {
-
 
     stopScanner();
 
 
     document.getElementById(
         "homePage"
-    ).style.display =
-        "block";
+    ).style.display = "block";
 
 
     document.getElementById(
         "scannerPage"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
     document.getElementById(
         "scanResult"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
     document.getElementById(
         "addPage"
-    ).style.display =
-        "none";
+    ).style.display = "none";
 
 
-    lookupWineData =
-        null;
+    lookupWineData = null;
 
 }
 
 </script>
-
 
 </body>
 
