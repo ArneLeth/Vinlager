@@ -21,12 +21,7 @@
 
 <script src="https://unpkg.com/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
 
-
 <style>
-
-/* =====================================================
-   GENERELT
-===================================================== */
 
 * {
     box-sizing: border-box;
@@ -36,7 +31,6 @@ body {
     margin: 0;
     background: #f7f5f2;
     color: #222;
-
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -219,9 +213,7 @@ button {
 .barcode {
     font-size: 21px;
     font-weight: bold;
-
     margin: 12px 0;
-
     letter-spacing: 1px;
 }
 
@@ -502,7 +494,7 @@ button {
 
 <!-- ===================================================
      SCAN RESULTAT
-=================================================== -->
+===================================================== -->
 
 <div id="scanResult">
 
@@ -521,7 +513,7 @@ button {
         id="lookupStatus"
         class="lookupStatus">
 
-        Søger efter vin...
+        Søger efter produkt...
 
     </div>
 
@@ -757,34 +749,19 @@ let lookupWineData = null;
 
 function startScanner() {
 
-    document.getElementById(
-        "homePage"
-    ).style.display = "none";
+    document.getElementById("homePage").style.display = "none";
 
+    document.getElementById("addPage").style.display = "none";
 
-    document.getElementById(
-        "addPage"
-    ).style.display = "none";
+    document.getElementById("scanResult").style.display = "none";
 
-
-    document.getElementById(
-        "scanResult"
-    ).style.display = "none";
-
-
-    document.getElementById(
-        "scannerPage"
-    ).style.display = "block";
-
+    document.getElementById("scannerPage").style.display = "block";
 
     lastCode = "";
 
     detectionCount = 0;
 
-
-    document.getElementById(
-        "scannerStatus"
-    ).textContent =
+    document.getElementById("scannerStatus").textContent =
         "Starter kamera…";
 
 
@@ -797,9 +774,7 @@ function startScanner() {
             type: "LiveStream",
 
             target:
-                document.querySelector(
-                    "#camera"
-                ),
+                document.querySelector("#camera"),
 
 
             constraints: {
@@ -1001,7 +976,6 @@ function finishScan(code) {
 
     stopScanner();
 
-
     lookupWineData = null;
 
 
@@ -1120,41 +1094,24 @@ async function lookupWine(code) {
 
 
     status.textContent =
-        "🔎 Søger efter vin...";
+        "🔎 Søger efter produkt...";
+
+
+    lookupWineData = null;
 
 
     /*
-       Open Food Facts v3
+       Open Food Facts v2
 
-       Vi henter kun de oplysninger,
-       vi har brug for.
+       Vi bruger den komplette produkt-
+       respons i stedet for at begrænse
+       fields.
     */
 
-    const fields = [
-
-        "code",
-        "product_name",
-        "product_name_da",
-        "generic_name",
-        "generic_name_da",
-        "brands",
-        "categories",
-        "categories_tags",
-        "countries",
-        "countries_tags",
-        "origins"
-
-    ].join(",");
-
-
     const url =
-        "https://world.openfoodfacts.org/api/v3/product/"
+        "https://world.openfoodfacts.org/api/v2/product/"
         + encodeURIComponent(code)
-        + "?product_type=all"
-        + "&lc=da"
-        + "&cc=dk"
-        + "&fields="
-        + encodeURIComponent(fields);
+        + ".json";
 
 
     try {
@@ -1162,10 +1119,6 @@ async function lookupWine(code) {
         const response =
             await fetch(url);
 
-
-        /*
-           HTTP-fejl
-        */
 
         if (!response.ok) {
 
@@ -1198,7 +1151,7 @@ async function lookupWine(code) {
 
 
             status.textContent =
-                "⚠️ Vinen blev ikke fundet "
+                "⚠️ Produktet blev ikke fundet "
                 + "automatisk. "
                 + "Du kan indtaste oplysningerne "
                 + "manuelt.";
@@ -1213,7 +1166,7 @@ async function lookupWine(code) {
 
 
         /*
-           Navn
+           NAVN
         */
 
         const name =
@@ -1222,56 +1175,99 @@ async function lookupWine(code) {
             ||
             product.product_name
             ||
+            product.product_name_en
+            ||
             product.generic_name_da
             ||
             product.generic_name
+            ||
+            product.generic_name_en
             ||
             "";
 
 
         /*
-           Producent
+           PRODUCENT
         */
 
         const producer =
-            product.brands || "";
+            product.brands
+            ||
+            product.brand_owner
+            ||
+            "";
 
 
         /*
-           Land
+           LAND
         */
 
-        const country =
-            extractCountry(product);
+        let country = "";
+
+
+        if (
+            product.countries_tags &&
+            product.countries_tags.length > 0
+        ) {
+
+            country =
+                product.countries_tags[0]
+                    .replace(/^en:/, "")
+                    .replace(/^da:/, "")
+                    .replace(/-/g, " ");
+
+        }
+
+        else if (
+            product.countries
+        ) {
+
+            country =
+                product.countries
+                    .split(",")[0]
+                    .trim();
+
+        }
+
+        else if (
+            product.origins
+        ) {
+
+            country =
+                product.origins
+                    .split(",")[0]
+                    .trim();
+
+        }
 
 
         /*
-           Type
+           TYPE
         */
 
         const type =
             detectWineType(product);
 
 
+        /*
+           GEM RESULTAT
+        */
+
         lookupWineData = {
 
-            name:
-                name,
+            name: name,
 
-            producer:
-                producer,
+            producer: producer,
 
-            country:
-                country,
+            country: country,
 
-            type:
-                type
+            type: type
 
         };
 
 
         /*
-           Vis resultat
+           VIS RESULTAT
         */
 
         status.className =
@@ -1281,8 +1277,9 @@ async function lookupWine(code) {
         if (name) {
 
             status.textContent =
-                "✅ Vin fundet automatisk. "
-                + "Kontrollér oplysningerne "
+                "✅ Produkt fundet: "
+                + name
+                + ". Kontrollér oplysningerne "
                 + "før du gemmer.";
 
         }
@@ -1291,8 +1288,8 @@ async function lookupWine(code) {
 
             status.textContent =
                 "✅ Stregkoden blev fundet, "
-                + "men der mangler oplysninger. "
-                + "Kontrollér formularen.";
+                + "men produktnavnet mangler. "
+                + "Kontrollér oplysningerne.";
 
         }
 
@@ -1309,99 +1306,17 @@ async function lookupWine(code) {
         lookupWineData = null;
 
 
-        /*
-           Vi viser ikke en teknisk fejl
-           til brugeren.
-
-           Brugeren kan stadig
-           indtaste vinen.
-        */
-
         status.className =
             "lookupStatus lookupWarning";
 
 
         status.textContent =
-            "⚠️ Der blev ikke fundet "
-            + "automatiske oplysninger. "
-            + "Indtast vinen manuelt.";
+            "⚠️ Kunne ikke hente oplysninger "
+            + "automatisk. "
+            + "Du kan stadig indtaste "
+            + "produktet manuelt.";
 
     }
-
-}
-
-
-/* =====================================================
-   FIND LAND
-===================================================== */
-
-function extractCountry(product) {
-
-    if (
-        Array.isArray(
-            product.countries_tags
-        )
-        &&
-        product.countries_tags.length
-    ) {
-
-        return cleanTaxonomyValue(
-            product.countries_tags[0]
-        );
-
-    }
-
-
-    if (product.countries) {
-
-        return product.countries
-            .split(",")[0]
-            .trim();
-
-    }
-
-
-    if (product.origins) {
-
-        return product.origins
-            .split(",")[0]
-            .trim();
-
-    }
-
-
-    return "";
-
-}
-
-
-/* =====================================================
-   RENS TAXONOMI
-===================================================== */
-
-function cleanTaxonomyValue(value) {
-
-    if (!value) {
-        return "";
-    }
-
-
-    const parts =
-        value.split(":");
-
-
-    if (parts.length > 1) {
-
-        return parts
-            .slice(1)
-            .join(":")
-            .replace(/-/g, " ");
-
-    }
-
-
-    return value
-        .replace(/-/g, " ");
 
 }
 
@@ -1721,7 +1636,8 @@ function resetWineForm() {
     );
 
 
-    preview.style.display = "none";
+    preview.style.display =
+        "none";
 
 
     document.getElementById(
@@ -1735,7 +1651,9 @@ function resetWineForm() {
         );
 
 
-    status.style.display = "none";
+    status.style.display =
+        "none";
+
 
     status.textContent = "";
 
@@ -1772,8 +1690,7 @@ function showAddForm(
 
 
     /*
-       Vigtigt:
-       reset før nye data indsættes.
+       Reset før nye data indsættes
     */
 
     resetWineForm();
@@ -1828,7 +1745,8 @@ function showAddForm(
             );
 
 
-        status.style.display = "block";
+        status.style.display =
+            "block";
 
 
         status.className =
@@ -1932,10 +1850,8 @@ function saveWine() {
 
 
     /*
-       Midlertidig lokal testlagring.
-
-       Denne del erstatter vi med
-       OneDrive i næste trin.
+       Midlertidig lokal lagring.
+       Denne erstattes med OneDrive.
     */
 
     localStorage.setItem(
