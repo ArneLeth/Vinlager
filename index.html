@@ -451,6 +451,16 @@ button {
     </span>
 
 </button>
+   
+<button class="category" onclick="showCategory('Rosévin')">
+
+    🌸 Rosévin
+
+    <span class="count" id="countRosevin">
+        0
+    </span>
+
+</button>
 
 <button
     class="category"
@@ -643,6 +653,7 @@ button {
 
     <option value="Rødvin">🍷 Rødvin</option>
     <option value="Hvidvin">🥂 Hvidvin</option>
+    <option value="Rosévin">🌸 Rosévin</option>
     <option value="Mousserende">🫧 Mousserende</option>
     <option value="Champagne">🍾 Champagne</option>
     <option value="Portvin">🍷 Portvin</option>
@@ -1471,6 +1482,7 @@ function updateCounts(
 
         "Rødvin": 0,
         "Hvidvin": 0,
+        "Rosévin":0,
         "Mousserende": 0,
         "Champagne": 0,
         "Portvin": 0,
@@ -2832,6 +2844,31 @@ function detectWineType(
         return "Champagne";
 
     }
+    if (
+
+    text.includes("rosé")
+    ||
+    text.includes("rose wine")
+    ||
+    text.includes("rose-wine")
+    ||
+    text.includes("rosévin")
+    ||
+    text.includes("rosevin")
+    ||
+    text.includes("vino rosato")
+    ||
+    text.includes("vin rosé")
+    ||
+    text.includes("rosado")
+    ||
+    text.includes("rosado")
+
+) {
+
+    return "Rosévin";
+
+}
 
     if (
         text.includes("port wine")
