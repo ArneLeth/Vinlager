@@ -1,540 +1,5554 @@
 <!DOCTYPE html>
 <html lang="da">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Vinlager">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<meta name="apple-mobile-web-app-capable"
+      content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+      content="default">
+
+<meta name="apple-mobile-web-app-title"
+      content="Vinlager">
+
 <title>Mit Vinlager</title>
 
+
+<!-- =====================================================
+     QUAGGA2 - STREGKODESCANNER
+===================================================== -->
+
 <script src="https://unpkg.com/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
+
+
+<!-- =====================================================
+     GOOGLE IDENTITY SERVICES
+===================================================== -->
+
 <script src="https://accounts.google.com/gsi/client"></script>
 
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f7f5f2;color:#222;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.app{max-width:600px;margin:auto;padding:20px}
-h1{text-align:center;margin:10px 0 5px;font-size:30px}
-h2{margin-top:5px}
-.subtitle{text-align:center;color:#777;margin-bottom:25px}
-button{width:100%;border:0;border-radius:14px;padding:16px;margin:7px 0;font-size:17px;font-weight:600;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-button:disabled{opacity:.5}
-.scan{font-size:20px;padding:21px;background:#222;color:#fff}
-.category{text-align:left;font-weight:500}
-.count{float:right;color:#888}
-.save{background:#222;color:#fff}
-.back{background:#ddd;color:#222}
-.google{background:#4285f4;color:#fff}
-.logout{background:#eee;color:#444}
-#homePage{display:block}#scannerPage,#addPage,#scanResult,#searchPage{display:none}
-#googleStatus{text-align:center;padding:10px;margin:10px 0 15px;border-radius:10px;background:#eee;color:#666;font-size:14px}
-#camera{position:relative;width:100%;overflow:hidden;border-radius:16px;background:#000}
-#camera video{width:100%;height:auto;display:block}
-#camera canvas.drawingBuffer{position:absolute;top:0;left:0}
-.scanbox{position:absolute;top:35%;left:5%;width:90%;height:30%;border:3px solid #fff;border-radius:8px;pointer-events:none;box-shadow:0 0 0 9999px rgba(0,0,0,.2)}
-.scanline{position:absolute;top:50%;left:5%;width:90%;height:2px;background:red;pointer-events:none}
-.scanner-info{text-align:center;margin:15px 0;color:#666}
-#scanResult{margin-top:15px;padding:20px;background:#fff;border-radius:14px;text-align:center}
-.barcode{font-size:21px;font-weight:bold;margin:12px 0;letter-spacing:1px}
-.lookupStatus{padding:14px;margin:12px 0;border-radius:12px;text-align:center;background:#f1f1f1;color:#555;font-size:15px}
-.lookupSuccess{background:#e8f5e9;color:#216b2a}.lookupWarning{background:#fff3cd;color:#745b00}.lookupError{background:#f8d7da;color:#842029}
-.form input,.form select,.form textarea,#searchInput{width:100%;padding:14px;margin:6px 0 14px;border:1px solid #ddd;border-radius:10px;font-size:16px;background:#fff}
-.form label{font-weight:600}
-.photo-section{margin-top:10px;margin-bottom:15px}
-#photoPreview{width:100%;max-height:300px;object-fit:contain;border-radius:12px;display:none;background:#eee;margin-top:10px}
-.searchBox{position:relative}.searchBox input{margin-bottom:8px}
-.result{background:#fff;border-radius:14px;padding:14px;margin:9px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.resultTitle{font-weight:700;font-size:17px}.resultMeta{color:#666;font-size:14px;margin-top:4px}
-.empty{text-align:center;color:#777;padding:25px}
-@media(max-width:400px){.app{padding:15px}h1{font-size:26px}button{padding:15px}}
+
+/* =====================================================
+   GENERELT
+===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f7f5f2;
+    color: #222;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+.app {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin: 10px 0 5px;
+    font-size: 30px;
+}
+
+h2 {
+    margin-top: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+
+/* =====================================================
+   KNAPPER
+===================================================== */
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    padding: 17px;
+    margin: 7px 0;
+    font-size: 17px;
+    font-weight: 600;
+    background: white;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.99);
+}
+
+.scan {
+    font-size: 20px;
+    padding: 22px;
+    background: #222;
+    color: white;
+}
+
+.category {
+    text-align: left;
+    font-weight: 500;
+}
+
+.count {
+    float: right;
+    color: #888;
+}
+
+.save {
+    background: #222;
+    color: white;
+}
+
+.back {
+    background: #ddd;
+    color: #222;
+}
+
+.google {
+    background: #4285f4;
+    color: white;
+}
+
+.logout {
+    background: #eee;
+    color: #444;
+}
+
+.searchButton {
+    background: #fff;
+}
+
+.inventoryButton {
+    background: #fff;
+}
+
+
+/* =====================================================
+   SIDER
+===================================================== */
+
+.page {
+    display: none;
+}
+
+#homePage {
+    display: block;
+}
+
+
+/* =====================================================
+   GOOGLE STATUS
+===================================================== */
+
+#googleStatus {
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0 15px;
+
+    border-radius: 10px;
+
+    background: #eee;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   LAGER STATUS
+===================================================== */
+
+#inventoryStatus {
+    padding: 12px;
+    margin: 10px 0;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    background: #eee;
+
+    color: #666;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   SCANNER
+===================================================== */
+
+#camera {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 16px;
+    background: black;
+}
+
+#camera video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+#camera canvas.drawingBuffer {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.scanbox {
+    position: absolute;
+
+    top: 35%;
+    left: 5%;
+
+    width: 90%;
+    height: 30%;
+
+    border:
+        3px solid white;
+
+    border-radius: 8px;
+
+    pointer-events: none;
+
+    box-shadow:
+        0 0 0 9999px
+        rgba(0,0,0,.20);
+}
+
+.scanline {
+    position: absolute;
+
+    top: 50%;
+    left: 5%;
+
+    width: 90%;
+    height: 2px;
+
+    background: red;
+
+    pointer-events: none;
+}
+
+.scanner-info {
+    text-align: center;
+    margin: 15px 0;
+    color: #666;
+}
+
+
+/* =====================================================
+   SCAN RESULTAT
+===================================================== */
+
+#scanResult {
+    margin-top: 15px;
+    padding: 20px;
+
+    background: white;
+
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.barcode {
+    font-size: 21px;
+    font-weight: bold;
+
+    margin: 12px 0;
+
+    letter-spacing: 1px;
+}
+
+
+/* =====================================================
+   OPSLAGSSTATUS
+===================================================== */
+
+.lookupStatus {
+    padding: 14px;
+    margin: 12px 0;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    background: #f1f1f1;
+    color: #555;
+
+    font-size: 15px;
+}
+
+.lookupSuccess {
+    background: #e8f5e9;
+    color: #216b2a;
+}
+
+.lookupWarning {
+    background: #fff3cd;
+    color: #745b00;
+}
+
+.lookupError {
+    background: #f8d7da;
+    color: #842029;
+}
+
+
+/* =====================================================
+   FORMULAR
+===================================================== */
+
+.form input,
+.form select,
+.form textarea {
+
+    width: 100%;
+
+    padding: 14px;
+
+    margin: 6px 0 14px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    background: white;
+}
+
+.form label {
+    font-weight: 600;
+}
+
+
+/* =====================================================
+   FOTO
+===================================================== */
+
+.photo-section {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+#photoPreview {
+    width: 100%;
+    max-height: 300px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    display: none;
+
+    background: #eee;
+
+    margin-top: 10px;
+}
+
+
+/* =====================================================
+   SØGNING
+===================================================== */
+
+.searchBox {
+
+    width: 100%;
+
+    padding: 16px;
+
+    margin: 8px 0 12px;
+
+    border:
+        1px solid #ddd;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+
+    background: white;
+}
+
+.searchInfo {
+
+    text-align: center;
+
+    color: #777;
+
+    margin-bottom: 12px;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   LAGERKORT
+===================================================== */
+
+.wineCard {
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 15px;
+
+    margin: 12px 0;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.08);
+}
+
+.wineCardHeader {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 10px;
+}
+
+.wineCardName {
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+.wineCardProducer {
+
+    color: #666;
+
+    margin-top: 3px;
+
+    font-size: 14px;
+}
+
+.wineCardMeta {
+
+    margin-top: 10px;
+
+    color: #555;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.winePhoto {
+
+    width: 100%;
+
+    max-height: 230px;
+
+    object-fit: contain;
+
+    margin-top: 12px;
+
+    border-radius: 10px;
+
+    background: #f3f3f3;
+}
+
+.quantityBox {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-top: 12px;
+
+    padding-top: 12px;
+
+    border-top:
+        1px solid #eee;
+}
+
+.quantityControls {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.quantityControls button {
+
+    width: 42px;
+
+    height: 42px;
+
+    padding: 0;
+
+    margin: 0;
+
+    font-size: 22px;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 1px 5px rgba(0,0,0,.12);
+}
+
+.quantityNumber {
+
+    min-width: 40px;
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+.cardActions {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+.cardActions button {
+
+    flex: 1;
+
+    padding: 11px;
+
+    margin: 0;
+
+    font-size: 14px;
+}
+
+.editButton {
+    background: #eee;
+}
+
+.deleteButton {
+    background: #f8d7da;
+    color: #842029;
+}
+
+
+/* =====================================================
+   KATEGORIER
+===================================================== */
+
+.categoryHeader {
+
+    background: white;
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    margin-bottom: 12px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.06);
+}
+
+.categoryHeaderTitle {
+
+    font-size: 21px;
+
+    font-weight: 700;
+}
+
+.categoryHeaderCount {
+
+    color: #777;
+
+    margin-top: 4px;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   TOMT LAGER
+===================================================== */
+
+.emptyState {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 30px 20px;
+
+    text-align: center;
+
+    color: #777;
+
+    margin: 15px 0;
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading {
+
+    text-align: center;
+
+    padding: 25px;
+
+    color: #777;
+}
+
+
+/* =====================================================
+   RESPONSIVT
+===================================================== */
+
+@media (max-width: 400px) {
+
+    .app {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    button {
+        padding: 15px;
+    }
+
+}
+
 </style>
+
 </head>
 
+
 <body>
+
+
 <div class="app">
 
-<!-- FORSIDE -->
-<div id="homePage">
-<h1>🍷 Mit Vinlager</h1>
-<div class="subtitle">Dit private vinlager</div>
 
-<div id="googleStatus">☁️ Ikke forbundet til Google Drive</div>
+<!-- =====================================================
+     FORSIDE
+===================================================== -->
 
-<button id="googleLoginButton" class="google" onclick="loginGoogle()">☁️ Log ind med Google Drive</button>
-<button id="googleLogoutButton" class="logout" onclick="logoutGoogle()" style="display:none">Log ud af Google</button>
+<div id="homePage" class="page">
 
-<button class="scan" onclick="startScanner()">📷 Scan vin</button>
-<button onclick="showAddForm('')">➕ Tilføj vin</button>
-<button onclick="showSearch()">🔎 Søg i vinlager</button>
 
-<br>
+    <h1>
+        🍷 Mit Vinlager
+    </h1>
 
-<button class="category" onclick="showCategory('Rødvin')">🍷 Rødvin <span class="count" id="countRødvin">0</span></button>
-<button class="category" onclick="showCategory('Hvidvin')">🥂 Hvidvin <span class="count" id="countHvidvin">0</span></button>
-<button class="category" onclick="showCategory('Rosévin')">🌸 Rosévin <span class="count" id="countRosévin">0</span></button>
-<button class="category" onclick="showCategory('Mousserende')">🫧 Mousserende <span class="count" id="countMousserende">0</span></button>
-<button class="category" onclick="showCategory('Champagne')">🍾 Champagne <span class="count" id="countChampagne">0</span></button>
-<button class="category" onclick="showCategory('Portvin')">🍷 Portvin <span class="count" id="countPortvin">0</span></button>
-<button class="category" onclick="showCategory('Spiritus')">🥃 Spiritus <span class="count" id="countSpiritus">0</span></button>
+
+    <div class="subtitle">
+        Dit private vinlager
+    </div>
+
+
+    <!-- GOOGLE DRIVE -->
+
+    <div id="googleStatus">
+        ☁️ Ikke forbundet til Google Drive
+    </div>
+
+
+    <button
+        id="googleLoginButton"
+        class="google"
+        onclick="loginGoogle()">
+
+        ☁️ Log ind med Google Drive
+
+    </button>
+
+
+    <button
+        id="googleLogoutButton"
+        class="logout"
+        onclick="logoutGoogle()"
+        style="display:none;">
+
+        Log ud af Google
+
+    </button>
+
+
+    <!-- LAGERSTATUS -->
+
+    <div id="inventoryStatus">
+
+        📦 Lager ikke indlæst
+
+    </div>
+
+
+    <!-- SCAN -->
+
+    <button
+        class="scan"
+        onclick="startScanner()">
+
+        📷 Scan vin
+
+    </button>
+
+
+    <!-- TILFØJ -->
+
+    <button
+        onclick="showAddForm('')">
+
+        ➕ Tilføj vin
+
+    </button>
+
+
+    <!-- SØG -->
+
+    <button
+        class="searchButton"
+        onclick="showSearchPage()">
+
+        🔎 Søg i vinlager
+
+    </button>
+
+
+    <!-- HELE LAGERET -->
+
+    <button
+        class="inventoryButton"
+        onclick="showInventoryPage()">
+
+        📦 Se hele vinlageret
+
+    </button>
+
+
+    <br>
+
+
+    <!-- KATEGORIER -->
+
+    <button
+        class="category"
+        onclick="showCategory('Rødvin')">
+
+        🍷 Rødvin
+
+        <span
+            id="countRødvin"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Hvidvin')">
+
+        🥂 Hvidvin
+
+        <span
+            id="countHvidvin"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Rosévin')">
+
+        🌸 Rosévin
+
+        <span
+            id="countRosévin"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Mousserende')">
+
+        🫧 Mousserende
+
+        <span
+            id="countMousserende"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Champagne')">
+
+        🍾 Champagne
+
+        <span
+            id="countChampagne"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Portvin')">
+
+        🍷 Portvin
+
+        <span
+            id="countPortvin"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
+    <button
+        class="category"
+        onclick="showCategory('Spiritus')">
+
+        🥃 Spiritus
+
+        <span
+            id="countSpiritus"
+            class="count">
+            0
+        </span>
+
+    </button>
+
+
 </div>
 
-<!-- SCANNER -->
-<div id="scannerPage">
-<h2>📷 Scan vin</h2>
-<div class="scanner-info">Placer stregkoden inden for rammen</div>
-<div id="camera"><div class="scanbox"></div><div class="scanline"></div></div>
-<div id="scannerStatus" class="scanner-info">Starter kamera…</div>
-<button onclick="closeScanner()" class="back">← Luk scanner</button>
-</div>
 
-<!-- SCAN RESULTAT -->
-<div id="scanResult">
-<div>Stregkode fundet</div>
-<div id="barcode" class="barcode"></div>
-<div id="lookupStatus" class="lookupStatus">Søger efter vin...</div>
-<button id="addFoundWineButton" onclick="continueWithBarcode()">➕ Tilføj denne vin</button>
-<button onclick="scanAgain()" class="back">📷 Scan igen</button>
-</div>
+<!-- =====================================================
+     SCANNER
+===================================================== -->
 
-<!-- TILFØJ VIN -->
-<div id="addPage" class="form">
-<h2>➕ Tilføj vin</h2>
-<div id="formLookupStatus" class="lookupStatus" style="display:none"></div>
+<div id="scannerPage" class="page">
 
-<label>Stregkode</label><input id="wineBarcode" type="text" inputmode="numeric">
-<label>Navn</label><input id="wineName" type="text" placeholder="Vinens navn">
-<label>Producent</label><input id="wineProducer" type="text" placeholder="Producent">
-<label>Årgang</label><input id="wineYear" type="number" placeholder="Fx 2020">
 
-<label>Type</label>
-<select id="wineType">
-<option value="Rødvin">🍷 Rødvin</option>
-<option value="Hvidvin">🥂 Hvidvin</option>
-<option value="Rosévin">🌸 Rosévin</option>
-<option value="Mousserende">🫧 Mousserende</option>
-<option value="Champagne">🍾 Champagne</option>
-<option value="Portvin">🍷 Portvin</option>
-<option value="Spiritus">🥃 Spiritus</option>
-</select>
+    <h2>
+        📷 Scan vin
+    </h2>
 
-<label>Land</label><input id="wineCountry" type="text" placeholder="Fx Italien">
-<label>Antal</label><input id="wineQuantity" type="number" value="1" min="1">
-<label>Placering</label><input id="wineLocation" type="text" placeholder="Fx Reol 2, hylde 3">
 
-<div class="photo-section">
-<label>📸 Billede af etiketten</label>
-<input id="winePhoto" type="file" accept="image/*" capture="environment" onchange="previewPhoto(event)">
-<img id="photoPreview">
-</div>
+    <div class="scanner-info">
 
-<label>Noter</label>
-<textarea id="wineNotes" rows="4" placeholder="Dine egne noter"></textarea>
+        Placer stregkoden
+        inden for rammen
 
-<button class="save" id="saveButton" onclick="saveWine()">💾 Gem vin</button>
-<button class="back" onclick="showHome()">← Tilbage</button>
-</div>
+    </div>
 
-<!-- SØG -->
-<div id="searchPage">
-<h2>🔎 Søg i vinlager</h2>
-<div class="searchBox">
-<input id="searchInput" type="search" placeholder="Søg på vin, producent, land, stregkode..." oninput="renderSearchResults()">
-</div>
-<div id="searchResults"></div>
-<button class="back" onclick="showHome()">← Tilbage</button>
-</div>
+
+    <div id="camera">
+
+        <div class="scanbox"></div>
+
+        <div class="scanline"></div>
+
+    </div>
+
+
+    <div
+        id="scannerStatus"
+        class="scanner-info">
+
+        Starter kamera…
+
+    </div>
+
+
+    <button
+        onclick="closeScanner()"
+        class="back">
+
+        ← Luk scanner
+
+    </button>
+
 
 </div>
+
+
+<!-- =====================================================
+     SCAN RESULTAT
+===================================================== -->
+
+<div id="scanResult" class="page">
+
+
+    <div>
+        Stregkode fundet
+    </div>
+
+
+    <div
+        id="barcode"
+        class="barcode">
+    </div>
+
+
+    <div
+        id="lookupStatus"
+        class="lookupStatus">
+
+        Søger efter vin...
+
+    </div>
+
+
+    <button
+        id="addFoundWineButton"
+        onclick="continueWithBarcode()">
+
+        ➕ Tilføj denne vin
+
+    </button>
+
+
+    <button
+        onclick="scanAgain()"
+        class="back">
+
+        📷 Scan igen
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     SØGESIDE
+===================================================== -->
+
+<div id="searchPage" class="page">
+
+
+    <h2>
+        🔎 Søg i vinlager
+    </h2>
+
+
+    <input
+        id="searchInput"
+        class="searchBox"
+        type="search"
+        placeholder="Søg på navn, producent, land, stregkode..."
+        oninput="performSearch()">
+
+
+    <div
+        id="searchInfo"
+        class="searchInfo">
+
+        Indtast søgeord
+
+    </div>
+
+
+    <div id="searchResults"></div>
+
+
+    <button
+        onclick="showHome()"
+        class="back">
+
+        ← Tilbage
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     LAGEROVERSIGT
+===================================================== -->
+
+<div id="inventoryPage" class="page">
+
+
+    <h2>
+        📦 Vinlager
+    </h2>
+
+
+    <div
+        id="inventoryPageInfo"
+        class="searchInfo">
+
+        Henter lager...
+
+    </div>
+
+
+    <div id="inventoryResults"></div>
+
+
+    <button
+        onclick="showHome()"
+        class="back">
+
+        ← Tilbage
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     KATEGORISIDE
+===================================================== -->
+
+<div id="categoryPage" class="page">
+
+
+    <div
+        id="categoryHeader"
+        class="categoryHeader">
+
+    </div>
+
+
+    <div id="categoryResults"></div>
+
+
+    <button
+        onclick="showHome()"
+        class="back">
+
+        ← Tilbage
+
+    </button>
+
+
+</div>
+
+
+<!-- =====================================================
+     TILFØJ / REDIGER VIN
+===================================================== -->
+
+<div
+    id="addPage"
+    class="page form">
+
+
+    <h2 id="formTitle">
+        ➕ Tilføj vin
+    </h2>
+
+
+    <div
+        id="formLookupStatus"
+        class="lookupStatus"
+        style="display:none;">
+    </div>
+
+
+    <label>
+        Stregkode
+    </label>
+
+    <input
+        id="wineBarcode"
+        type="text"
+        inputmode="numeric">
+
+
+    <label>
+        Navn
+    </label>
+
+    <input
+        id="wineName"
+        type="text"
+        placeholder="Vinens navn">
+
+
+    <label>
+        Producent
+    </label>
+
+    <input
+        id="wineProducer"
+        type="text"
+        placeholder="Producent">
+
+
+    <label>
+        Årgang
+    </label>
+
+    <input
+        id="wineYear"
+        type="number"
+        placeholder="Fx 2020">
+
+
+    <label>
+        Type
+    </label>
+
+    <select id="wineType">
+
+        <option value="Rødvin">
+            🍷 Rødvin
+        </option>
+
+        <option value="Hvidvin">
+            🥂 Hvidvin
+        </option>
+
+        <option value="Rosévin">
+            🌸 Rosévin
+        </option>
+
+        <option value="Mousserende">
+            🫧 Mousserende
+        </option>
+
+        <option value="Champagne">
+            🍾 Champagne
+        </option>
+
+        <option value="Portvin">
+            🍷 Portvin
+        </option>
+
+        <option value="Spiritus">
+            🥃 Spiritus
+        </option>
+
+    </select>
+
+
+    <label>
+        Land
+    </label>
+
+    <input
+        id="wineCountry"
+        type="text"
+        placeholder="Fx Italien">
+
+
+    <label>
+        Antal
+    </label>
+
+    <input
+        id="wineQuantity"
+        type="number"
+        value="1"
+        min="0">
+
+
+    <label>
+        Placering
+    </label>
+
+    <input
+        id="wineLocation"
+        type="text"
+        placeholder="Fx Reol 2, hylde 3">
+
+
+    <!-- FOTO -->
+
+    <div class="photo-section">
+
+        <label>
+            📸 Billede af etiketten
+        </label>
+
+
+        <input
+            id="winePhoto"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onchange="previewPhoto(event)">
+
+
+        <img
+            id="photoPreview">
+
+    </div>
+
+
+    <label>
+        Noter
+    </label>
+
+
+    <textarea
+        id="wineNotes"
+        rows="4"
+        placeholder="Dine egne noter">
+    </textarea>
+
+
+    <button
+        id="saveWineButton"
+        class="save"
+        onclick="saveWine()">
+
+        💾 Gem vin
+
+    </button>
+
+
+    <button
+        class="back"
+        onclick="showHome()">
+
+        ← Tilbage
+
+    </button>
+
+
+</div>
+
+
+</div>
+
 
 <script>
-/* ================= GOOGLE ================= */
-const GOOGLE_CLIENT_ID="701927788585-hfkv438gs0ljn6ln9c05q6p9lsns9j6i.apps.googleusercontent.com";
-const GOOGLE_SCOPE="https://www.googleapis.com/auth/drive.file";
 
-let googleTokenClient=null;
-let googleAccessToken=null;
-let googleFolderId=localStorage.getItem("vinlagerGoogleFolderId");
-let winesCache=null;
-let winesCacheTime=0;
-const CACHE_TTL=60000;
+/* =====================================================
+   GOOGLE DRIVE
+===================================================== */
 
-async function loginGoogle(){
- if(!window.google?.accounts?.oauth2){
-   alert("Google-login er ikke indlæst endnu. Prøv igen om et øjeblik."); return;
- }
- googleTokenClient=google.accounts.oauth2.initTokenClient({
-   client_id:GOOGLE_CLIENT_ID,
-   scope:GOOGLE_SCOPE,
-   callback:async response=>{
-     if(response.error){
-       console.error(response);
-       document.getElementById("googleStatus").textContent="❌ Google-login fejlede.";
-       return;
-     }
-     googleAccessToken=response.access_token;
-     document.getElementById("googleStatus").textContent="☁️ Forbinder til Google Drive…";
-     document.getElementById("googleLoginButton").style.display="none";
-     document.getElementById("googleLogoutButton").style.display="block";
-     try{
-       await getOrCreateWineFolder();
-       await loadWinesFromDrive(true);
-       updateCounts();
-       document.getElementById("googleStatus").textContent="✅ Google Drive klar – Mit Vinlager";
-     }catch(e){
-       console.error(e);
-       document.getElementById("googleStatus").textContent="⚠️ Google er logget ind, men Drive kunne ikke åbnes.";
-     }
-   }
- });
- googleTokenClient.requestAccessToken({prompt:"consent"});
+const GOOGLE_CLIENT_ID =
+"701927788585-hfkv438gs0ljn6ln9c05q6p9lsns9j6i.apps.googleusercontent.com";
+
+
+const GOOGLE_SCOPE =
+"https://www.googleapis.com/auth/drive.file";
+
+
+let googleTokenClient = null;
+
+let googleAccessToken = null;
+
+let googleFolderId =
+    localStorage.getItem(
+        "vinlagerGoogleFolderId"
+    );
+
+
+/* =====================================================
+   LAGERDATA
+===================================================== */
+
+/*
+   Dette er vigtigt.
+
+   wines.json bliver hentet én gang til denne variabel.
+
+   Søgning, kategorier og lageroversigt bruger derefter
+   denne variabel i stedet for at spørge Google Drive
+   hver gang.
+*/
+
+let wines = [];
+
+
+/*
+   Hvilken vin redigerer vi?
+*/
+
+let editingWineId = null;
+
+
+/*
+   Aktuel kategori
+*/
+
+let currentCategory = null;
+
+
+/* =====================================================
+   HJÆLPEFUNKTIONER
+===================================================== */
+
+function getQuantity(wine) {
+
+    const quantity =
+        parseInt(
+            wine.quantity,
+            10
+        );
+
+    if (
+        isNaN(quantity)
+    ) {
+
+        return 0;
+
+    }
+
+    return Math.max(
+        0,
+        quantity
+    );
+
 }
 
-function logoutGoogle(){
- if(googleAccessToken && window.google) google.accounts.oauth2.revoke(googleAccessToken);
- googleAccessToken=null; winesCache=null;
- document.getElementById("googleStatus").textContent="☁️ Ikke forbundet til Google Drive";
- document.getElementById("googleLoginButton").style.display="block";
- document.getElementById("googleLogoutButton").style.display="none";
+
+function totalBottleCount(list) {
+
+    return list.reduce(
+        function(total, wine) {
+
+            return total +
+                getQuantity(wine);
+
+        },
+        0
+    );
+
 }
 
-async function driveRequest(url,options={}){
- if(!googleAccessToken) throw new Error("Ikke logget ind på Google Drive.");
- options.headers={...(options.headers||{}),Authorization:"Bearer "+googleAccessToken};
- const r=await fetch(url,options);
- if(!r.ok){
-   let msg="";
-   try{const d=await r.json();msg=d.error?.message||JSON.stringify(d)}catch{msg=await r.text()}
-   throw new Error(msg);
- }
- return r;
+
+/* =====================================================
+   GOOGLE LOGIN
+===================================================== */
+
+function loginGoogle() {
+
+    if (
+        !window.google ||
+        !google.accounts ||
+        !google.accounts.oauth2
+    ) {
+
+        alert(
+            "Google-login er ikke indlæst endnu. " +
+            "Prøv igen om et øjeblik."
+        );
+
+        return;
+
+    }
+
+
+    googleTokenClient =
+        google.accounts.oauth2.initTokenClient({
+
+            client_id:
+                GOOGLE_CLIENT_ID,
+
+            scope:
+                GOOGLE_SCOPE,
+
+            callback:
+                async function(response) {
+
+                    if (
+                        response.error
+                    ) {
+
+                        console.error(
+                            "Google login fejl:",
+                            response
+                        );
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "❌ Google-login fejlede.";
+
+                        return;
+
+                    }
+
+
+                    googleAccessToken =
+                        response.access_token;
+
+
+                    document.getElementById(
+                        "googleStatus"
+                    ).textContent =
+                        "☁️ Forbundet til Google Drive";
+
+
+                    document.getElementById(
+                        "googleLoginButton"
+                    ).style.display =
+                        "none";
+
+
+                    document.getElementById(
+                        "googleLogoutButton"
+                    ).style.display =
+                        "block";
+
+
+                    try {
+
+                        await getOrCreateWineFolder();
+
+
+                        await refreshWineInventory();
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "✅ Google Drive klar – Mit Vinlager";
+
+                    }
+
+                    catch (
+                        error
+                    ) {
+
+                        console.error(
+                            error
+                        );
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "⚠️ Google er logget ind, "
+                            + "men lageret kunne ikke læses.";
+
+                    }
+
+                }
+
+        });
+
+
+    googleTokenClient.requestAccessToken({
+
+        prompt:
+            "consent"
+
+    });
+
 }
 
-async function getOrCreateWineFolder(){
- if(googleFolderId) return googleFolderId;
- const q="name='Mit Vinlager' and mimeType='application/vnd.google-apps.folder' and trashed=false";
- const url="https://www.googleapis.com/drive/v3/files?q="+encodeURIComponent(q)+"&spaces=drive&fields=files(id,name)";
- const data=await (await driveRequest(url)).json();
- if(data.files?.length){
-   googleFolderId=data.files[0].id;
- }else{
-   const r=await driveRequest("https://www.googleapis.com/drive/v3/files",{
-     method:"POST",headers:{"Content-Type":"application/json"},
-     body:JSON.stringify({name:"Mit Vinlager",mimeType:"application/vnd.google-apps.folder"})
-   });
-   googleFolderId=(await r.json()).id;
- }
- localStorage.setItem("vinlagerGoogleFolderId",googleFolderId);
- return googleFolderId;
+
+/* =====================================================
+   GOOGLE LOGOUT
+===================================================== */
+
+function logoutGoogle() {
+
+    if (
+        googleAccessToken &&
+        window.google
+    ) {
+
+        google.accounts.oauth2.revoke(
+            googleAccessToken
+        );
+
+    }
+
+
+    googleAccessToken =
+        null;
+
+
+    wines = [];
+
+
+    googleFolderId =
+        null;
+
+
+    localStorage.removeItem(
+        "vinlagerGoogleFolderId"
+    );
+
+
+    document.getElementById(
+        "googleStatus"
+    ).textContent =
+        "☁️ Ikke forbundet til Google Drive";
+
+
+    document.getElementById(
+        "googleLoginButton"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "googleLogoutButton"
+    ).style.display =
+        "none";
+
+
+    updateFrontPageCounts();
+
 }
 
-async function findDriveFile(fileName){
- const q="name='"+fileName.replace(/'/g,"\\'")+"' and '"+googleFolderId+"' in parents and trashed=false";
- const url="https://www.googleapis.com/drive/v3/files?q="+encodeURIComponent(q)+"&spaces=drive&fields=files(id,name,mimeType)";
- const data=await (await driveRequest(url)).json();
- return data.files?.[0]||null;
+
+/* =====================================================
+   GOOGLE DRIVE REQUEST
+===================================================== */
+
+async function driveRequest(
+    url,
+    options = {}
+) {
+
+    if (
+        !googleAccessToken
+    ) {
+
+        throw new Error(
+            "Ikke logget ind på Google Drive."
+        );
+
+    }
+
+
+    const headers =
+        options.headers || {};
+
+
+    headers.Authorization =
+        "Bearer "
+        + googleAccessToken;
+
+
+    options.headers =
+        headers;
+
+
+    const response =
+        await fetch(
+            url,
+            options
+        );
+
+
+    /*
+       Hvis token er udløbet.
+    */
+
+    if (
+        response.status === 401
+    ) {
+
+        googleAccessToken =
+            null;
+
+
+        document.getElementById(
+            "googleStatus"
+        ).textContent =
+            "⚠️ Google-login skal fornys.";
+
+
+        throw new Error(
+            "Google-login er udløbet. Log ind igen."
+        );
+
+    }
+
+
+    if (
+        !response.ok
+    ) {
+
+        let errorText =
+            "";
+
+
+        try {
+
+            const errorData =
+                await response.json();
+
+
+            errorText =
+                errorData.error?.message
+                ||
+                JSON.stringify(
+                    errorData
+                );
+
+        }
+
+        catch {
+
+            errorText =
+                await response.text();
+
+        }
+
+
+        throw new Error(
+            errorText
+        );
+
+    }
+
+
+    return response;
+
 }
 
-/* Hurtigere: wines.json hentes kun én gang pr. session/cacheperiode. */
-async function loadWinesFromDrive(force=false){
- if(!force && winesCache && Date.now()-winesCacheTime<CACHE_TTL) return winesCache;
- const file=await findDriveFile("wines.json");
- if(!file){winesCache=[];winesCacheTime=Date.now();return winesCache}
- const text=await (await driveRequest("https://www.googleapis.com/drive/v3/files/"+file.id+"?alt=media")).text();
- try{winesCache=JSON.parse(text);if(!Array.isArray(winesCache))winesCache=[]}
- catch{winesCache=[]}
- winesCacheTime=Date.now();
- return winesCache;
+
+/* =====================================================
+   FIND / OPRET VINLAGER-MAPPE
+===================================================== */
+
+async function getOrCreateWineFolder() {
+
+    if (
+        googleFolderId
+    ) {
+
+        return googleFolderId;
+
+    }
+
+
+    const searchUrl =
+        "https://www.googleapis.com/drive/v3/files"
+        + "?q="
+        + encodeURIComponent(
+            "name='Mit Vinlager'"
+            + " and mimeType='application/vnd.google-apps.folder'"
+            + " and trashed=false"
+        )
+        + "&spaces=drive"
+        + "&fields=files(id,name)";
+
+
+    const response =
+        await driveRequest(
+            searchUrl
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        data.files &&
+        data.files.length > 0
+    ) {
+
+        googleFolderId =
+            data.files[0].id;
+
+
+        localStorage.setItem(
+            "vinlagerGoogleFolderId",
+            googleFolderId
+        );
+
+
+        return googleFolderId;
+
+    }
+
+
+    const createResponse =
+        await driveRequest(
+            "https://www.googleapis.com/drive/v3/files",
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        name:
+                            "Mit Vinlager",
+
+                        mimeType:
+                            "application/vnd.google-apps.folder"
+
+                    })
+
+            }
+        );
+
+
+    const folder =
+        await createResponse.json();
+
+
+    googleFolderId =
+        folder.id;
+
+
+    localStorage.setItem(
+        "vinlagerGoogleFolderId",
+        googleFolderId
+    );
+
+
+    return googleFolderId;
+
 }
 
-/* Hurtigere end den gamle løsning: gemmer kun wines.json én gang efter ændringen. */
-async function saveWinesToDrive(wines){
- const json=JSON.stringify(wines);
- const existing=await findDriveFile("wines.json");
- const boundary="----VinlagerBoundary"+Date.now();
- const metadata={name:"wines.json",mimeType:"application/json",...(existing?{}:{parents:[googleFolderId]})};
- const body=[
-   "--"+boundary,
-   "Content-Type: application/json; charset=UTF-8","",
-   JSON.stringify(metadata),
-   "--"+boundary,
-   "Content-Type: application/json","",
-   json,
-   "--"+boundary+"--",""
- ].join("\r\n");
- const url=existing
-   ?"https://www.googleapis.com/upload/drive/v3/files/"+existing.id+"?uploadType=multipart"
-   :"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
- await driveRequest(url,{
-   method:existing?"PATCH":"POST",
-   headers:{"Content-Type":"multipart/related; boundary="+boundary},
-   body
- });
- winesCache=wines;
- winesCacheTime=Date.now();
+
+/* =====================================================
+   FIND FIL I VINLAGER
+===================================================== */
+
+async function findDriveFile(
+    fileName
+) {
+
+    if (
+        !googleFolderId
+    ) {
+
+        throw new Error(
+            "Google Drive-mappen er ikke klar."
+        );
+
+    }
+
+
+    const safeName =
+        fileName.replace(
+            /'/g,
+            "\\'"
+        );
+
+
+    const query =
+        "name='"
+        + safeName
+        + "'"
+        + " and '"
+        + googleFolderId
+        + "' in parents"
+        + " and trashed=false";
+
+
+    const url =
+        "https://www.googleapis.com/drive/v3/files"
+        + "?q="
+        + encodeURIComponent(
+            query
+        )
+        + "&spaces=drive"
+        + "&fields=files(id,name,mimeType,size)";
+
+
+    const response =
+        await driveRequest(
+            url
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        data.files &&
+        data.files.length
+    ) {
+
+        return data.files[0];
+
+    }
+
+
+    return null;
+
 }
 
-/* ================= BILLEDE ================= */
-function compressImage(file){
- return new Promise((resolve,reject)=>{
-   const reader=new FileReader();
-   reader.onload=e=>{
-     const img=new Image();
-     img.onload=()=>{
-       const MAX=900;
-       let w=img.width,h=img.height;
-       if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
-       const c=document.createElement("canvas");c.width=w;c.height=h;
-       c.getContext("2d").drawImage(img,0,0,w,h);
-       c.toBlob(b=>b?resolve(b):reject(new Error("Kunne ikke komprimere billedet.")),"image/jpeg",.70);
-     };
-     img.onerror=reject;img.src=e.target.result;
-   };
-   reader.onerror=reject;reader.readAsDataURL(file);
- });
+
+/* =====================================================
+   HENT WINES.JSON
+===================================================== */
+
+async function loadWinesFromDrive() {
+
+    const file =
+        await findDriveFile(
+            "wines.json"
+        );
+
+
+    if (!file) {
+
+        return [];
+
+    }
+
+
+    const response =
+        await driveRequest(
+            "https://www.googleapis.com/drive/v3/files/"
+            + file.id
+            + "?alt=media"
+        );
+
+
+    const text =
+        await response.text();
+
+
+    if (
+        !text.trim()
+    ) {
+
+        return [];
+
+    }
+
+
+    try {
+
+        const parsed =
+            JSON.parse(
+                text
+            );
+
+
+        if (
+            Array.isArray(
+                parsed
+            )
+        ) {
+
+            return parsed;
+
+        }
+
+
+        return [];
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "wines.json kunne ikke læses:",
+            error
+        );
+
+
+        return [];
+
+    }
+
 }
 
-async function uploadWinePhoto(file,wineId){
- const compressed=await compressImage(file);
- const metadata={name:"vin_"+wineId+".jpg",mimeType:"image/jpeg",parents:[googleFolderId]};
- const boundary="----VinPhotoBoundary"+Date.now();
- const blob=new Blob([
-   "--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n",
-   JSON.stringify(metadata),
-   "\r\n--"+boundary+"\r\nContent-Type: image/jpeg\r\n\r\n",
-   compressed,
-   "\r\n--"+boundary+"--\r\n"
- ],{type:"multipart/related; boundary="+boundary});
- const r=await driveRequest("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",{
-   method:"POST",headers:{"Content-Type":"multipart/related; boundary="+boundary},body:blob
- });
- return (await r.json()).id;
+
+/* =====================================================
+   HENT / OPDATER LAGER
+===================================================== */
+
+async function refreshWineInventory() {
+
+    if (
+        !googleAccessToken
+    ) {
+
+        wines = [];
+
+
+        updateFrontPageCounts();
+
+
+        document.getElementById(
+            "inventoryStatus"
+        ).textContent =
+            "☁️ Log ind for at se lageret.";
+
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "inventoryStatus"
+    ).textContent =
+        "☁️ Henter vinlager…";
+
+
+    try {
+
+        await getOrCreateWineFolder();
+
+
+        wines =
+            await loadWinesFromDrive();
+
+
+        if (
+            !Array.isArray(
+                wines
+            )
+        ) {
+
+            wines = [];
+
+        }
+
+
+        updateFrontPageCounts();
+
+
+        document.getElementById(
+            "inventoryStatus"
+        ).textContent =
+            "📦 "
+            + totalBottleCount(wines)
+            + " flasker på lager";
+
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+
+        document.getElementById(
+            "inventoryStatus"
+        ).textContent =
+            "⚠️ Kunne ikke hente lageret.";
+
+    }
+
 }
 
-/* ================= SCANNER ================= */
-let scannerRunning=false,lastCode="",detectionCount=0;
-const REQUIRED_DETECTIONS=2;
-let lookupWineData=null;
 
-function startScanner(){
- showOnly("scannerPage");
- lastCode="";detectionCount=0;
- document.getElementById("scannerStatus").textContent="Starter kamera…";
- const config={
-  inputStream:{
-   name:"Live",type:"LiveStream",target:document.querySelector("#camera"),
-   constraints:{width:{min:640,ideal:1280},height:{min:480,ideal:720},facingMode:{ideal:"environment"},focusMode:"continuous"},
-   area:{top:"25%",right:"5%",left:"5%",bottom:"25%"}
-  },
-  locator:{patchSize:"medium",halfSample:true},
-  frequency:15,
-  decoder:{readers:["ean_reader","ean_8_reader"]},
-  locate:true,numOfWorkers:navigator.hardwareConcurrency?Math.min(navigator.hardwareConcurrency,4):2
- };
- Quagga.init(config,error=>{
-  if(error){console.error(error);document.getElementById("scannerStatus").textContent="Kameraet kunne ikke startes.";return}
-  Quagga.start();scannerRunning=true;
-  document.getElementById("scannerStatus").textContent="Scanner…";
-  Quagga.onDetected(barcodeDetected);
- });
+/* =====================================================
+   GEM WINES.JSON
+===================================================== */
+
+async function saveWinesToDrive(
+    wineList
+) {
+
+    const json =
+        JSON.stringify(
+            wineList,
+            null,
+            2
+        );
+
+
+    const existingFile =
+        await findDriveFile(
+            "wines.json"
+        );
+
+
+    const boundary =
+        "-------314159265358979323846";
+
+
+    const delimiter =
+        "\r\n--"
+        + boundary
+        + "\r\n";
+
+
+    const closeDelimiter =
+        "\r\n--"
+        + boundary
+        + "--";
+
+
+    const metadata = {
+
+        name:
+            "wines.json",
+
+        mimeType:
+            "application/json"
+
+    };
+
+
+    if (
+        !existingFile
+    ) {
+
+        metadata.parents =
+            [googleFolderId];
+
+    }
+
+
+    const body =
+        delimiter
+        + "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        + JSON.stringify(
+            metadata
+        )
+        + delimiter
+        + "Content-Type: application/json\r\n\r\n"
+        + json
+        + closeDelimiter;
+
+
+    let url;
+
+    let method;
+
+
+    if (
+        existingFile
+    ) {
+
+        url =
+            "https://www.googleapis.com/upload/drive/v3/files/"
+            + existingFile.id
+            + "?uploadType=multipart";
+
+
+        method =
+            "PATCH";
+
+    }
+
+    else {
+
+        url =
+            "https://www.googleapis.com/upload/drive/v3/files"
+            + "?uploadType=multipart";
+
+
+        method =
+            "POST";
+
+    }
+
+
+    await driveRequest(
+        url,
+        {
+
+            method:
+                method,
+
+            headers: {
+
+                "Content-Type":
+                    "multipart/related; boundary="
+                    + boundary
+
+            },
+
+            body:
+                body
+
+        }
+    );
+
 }
 
-function barcodeDetected(result){
- const code=result?.codeResult?.code,format=result?.codeResult?.format;
- if(!code || !["ean_13","ean_8"].includes(format))return;
- if(code===lastCode)detectionCount++;else{lastCode=code;detectionCount=1}
- document.getElementById("scannerStatus").textContent="EAN fundet – bekræfter…";
- if(detectionCount>=REQUIRED_DETECTIONS)finishScan(code);
-}
-function finishScan(code){
- stopScanner();lookupWineData=null;
- document.getElementById("barcode").textContent=code;
- showOnly("scanResult");lookupWine(code);
-}
-function stopScanner(){
- if(!scannerRunning)return;
- try{Quagga.offDetected(barcodeDetected);Quagga.stop()}catch(e){console.log(e)}
- scannerRunning=false;
-}
-function closeScanner(){stopScanner();showHome()}
-function scanAgain(){lookupWineData=null;startScanner()}
 
-/* ================= OPSLAG ================= */
-async function lookupWine(code){
- const status=document.getElementById("lookupStatus");
- status.className="lookupStatus";status.textContent="🔎 Søger efter vin…";
- const fields=["code","product_name","product_name_da","generic_name","generic_name_da","brands","categories","categories_tags","countries","countries_tags","origins"].join(",");
- const url="https://world.openfoodfacts.org/api/v3/product/"+encodeURIComponent(code)+"?product_type=all&lc=da&cc=dk&fields="+encodeURIComponent(fields);
- try{
-  const r=await fetch(url);
-  if(!r.ok){
-   lookupWineData=null;status.className="lookupStatus lookupWarning";
-   status.textContent="⚠️ Stregkoden findes ikke i databasen. Du kan indtaste vinen manuelt.";return;
-  }
-  const data=await r.json(),p=data.product;
-  if(!p){lookupWineData=null;status.className="lookupStatus lookupWarning";status.textContent="⚠️ Vinen blev ikke fundet i databasen.";return}
-  const name=p.product_name_da||p.product_name||p.generic_name_da||p.generic_name||"";
-  lookupWineData={name,producer:p.brands||"",country:extractCountry(p),type:detectWineType(p)};
-  status.className="lookupStatus lookupSuccess";
-  status.textContent=name?"✅ Vin fundet: "+name+". Kontrollér oplysningerne før du gemmer.":"✅ Stregkoden blev fundet, men der mangler vinoplysninger.";
- }catch(e){
-  console.error(e);lookupWineData=null;status.className="lookupStatus lookupError";
-  status.textContent="⚠️ Kunne ikke kontakte vin-databasen. Du kan stadig indtaste vinen manuelt.";
- }
-}
+/* =====================================================
+   KOMPRIMER BILLEDE
+===================================================== */
 
-function extractCountry(p){
- if(Array.isArray(p.countries_tags)&&p.countries_tags.length)return cleanTaxonomyValue(p.countries_tags[0]);
- if(p.countries)return p.countries.split(",")[0].trim();
- if(p.origins)return p.origins.split(",")[0].trim();
- return "";
-}
-function cleanTaxonomyValue(v){if(!v)return "";const a=v.split(":");return (a.length>1?a.slice(1).join(":"):a[0]).replace(/-/g," ")}
-function detectWineType(p){
- const text=((p.product_name||"")+" "+(p.product_name_da||"")+" "+(p.generic_name||"")+" "+(p.categories||"")+" "+(Array.isArray(p.categories_tags)?p.categories_tags.join(" "):"")).toLowerCase();
- if(text.includes("champagne"))return"Champagne";
- if(/port wine|portwine|portvin|porto/.test(text))return"Portvin";
- if(/sparkling|mousser|prosecco|cava|crémant|cremant|sekt/.test(text))return"Mousserende";
- if(/spirit|whisky|whiskey|vodka|gin|rum|brandy|cognac|liqueur|likør/.test(text))return"Spiritus";
- if(/rosé|rose wine|rose-wine|rosévin|rosevin|vin rosé|vino rosato|rosato/.test(text))return"Rosévin";
- if(/white wine|white-wine|hvidvin|vino bianco|vin blanc|weisswein|weißwein/.test(text))return"Hvidvin";
- if(/red wine|red-wine|rødvin|vino rosso|vin rouge|rotwein/.test(text))return"Rødvin";
- return"Rødvin";
-}
+function compressImage(
+    file
+) {
 
-/* ================= FORM ================= */
-function continueWithBarcode(){showAddForm(document.getElementById("barcode").textContent,lookupWineData)}
+    return new Promise(
+        function(resolve, reject) {
 
-function resetWineForm(){
- document.querySelectorAll("#addPage input").forEach(i=>{
-  if(i.type==="file")i.value="";
-  else if(i.type==="number")i.value=i.id==="wineQuantity"?"1":"";
-  else i.value="";
- });
- document.getElementById("wineType").selectedIndex=0;
- document.getElementById("wineNotes").value="";
- const p=document.getElementById("photoPreview");p.removeAttribute("src");p.style.display="none";
- const s=document.getElementById("formLookupStatus");s.style.display="none";s.textContent="";s.className="lookupStatus";
-}
+            const reader =
+                new FileReader();
 
-function showAddForm(code,wineData){
- showOnly("addPage");resetWineForm();
- if(code)document.getElementById("wineBarcode").value=code;
- if(wineData){
-  document.getElementById("wineName").value=wineData.name||"";
-  document.getElementById("wineProducer").value=wineData.producer||"";
-  document.getElementById("wineCountry").value=wineData.country||"";
-  document.getElementById("wineType").value=wineData.type||"Rødvin";
-  const s=document.getElementById("formLookupStatus");s.style.display="block";s.className="lookupStatus lookupSuccess";
-  s.textContent="✅ Oplysninger hentet automatisk. Kontrollér dem før du gemmer.";
- }
-}
-function previewPhoto(e){
- const f=e.target.files[0];if(!f)return;
- const img=document.getElementById("photoPreview");img.src=URL.createObjectURL(f);img.style.display="block";
-}
 
-async function saveWine(){
- const saveBtn=document.getElementById("saveButton");
- if(saveBtn.disabled)return;
- const wine={
-  id:Date.now().toString(),
-  barcode:document.getElementById("wineBarcode").value.trim(),
-  name:document.getElementById("wineName").value.trim(),
-  producer:document.getElementById("wineProducer").value.trim(),
-  year:document.getElementById("wineYear").value,
-  type:document.getElementById("wineType").value,
-  country:document.getElementById("wineCountry").value.trim(),
-  quantity:Math.max(1,parseInt(document.getElementById("wineQuantity").value)||1),
-  location:document.getElementById("wineLocation").value.trim(),
-  notes:document.getElementById("wineNotes").value.trim(),
-  photoFileId:null,dateAdded:new Date().toISOString()
- };
- if(!wine.name && !wine.barcode){alert("Indtast mindst vinens navn eller stregkode.");return}
+            reader.onload =
+                function(event) {
 
- localStorage.setItem("testWine",JSON.stringify(wine));
- saveBtn.disabled=true;saveBtn.textContent="☁️ Gemmer…";
+                    const image =
+                        new Image();
 
- try{
-  if(!googleAccessToken){
-   alert("Vinen er gemt lokalt. Log ind med Google Drive for at gemme den i dit Google Drive.");
-   return;
-  }
-  await getOrCreateWineFolder();
-  const photo=document.getElementById("winePhoto").files[0]||null;
-  const status=document.getElementById("formLookupStatus");status.style.display="block";status.className="lookupStatus";
 
-  if(photo){
-   status.textContent="☁️ Gemmer billede…";
-   wine.photoFileId=await uploadWinePhoto(photo,wine.id);
-  }
+                    image.onload =
+                        function() {
 
-  /* Brug cache: vi behøver ikke hente wines.json igen lige efter login/gemning. */
-  const wines=await loadWinesFromDrive(false);
-  wines.push(wine);
-  status.textContent="☁️ Gemmer vinlager…";
-  await saveWinesToDrive(wines);
-  updateCounts();
-  alert("✅ Vinen er gemt i Google Drive.");
-  resetWineForm();showHome();
- }catch(e){
-  console.error(e);
-  alert("⚠️ Der opstod en fejl ved gemning til Google Drive.\n\nVinen er gemt lokalt på telefonen.\n\nFejl: "+e.message);
-  resetWineForm();showHome();
- }finally{
-  saveBtn.disabled=false;saveBtn.textContent="💾 Gem vin";
- }
+                            const MAX_WIDTH =
+                                1200;
+
+
+                            let width =
+                                image.width;
+
+
+                            let height =
+                                image.height;
+
+
+                            if (
+                                width >
+                                MAX_WIDTH
+                            ) {
+
+                                height =
+                                    height
+                                    *
+                                    MAX_WIDTH
+                                    /
+                                    width;
+
+
+                                width =
+                                    MAX_WIDTH;
+
+                            }
+
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+
+                            canvas.width =
+                                width;
+
+
+                            canvas.height =
+                                height;
+
+
+                            const context =
+                                canvas.getContext(
+                                    "2d"
+                                );
+
+
+                            context.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+
+                            canvas.toBlob(
+
+                                function(blob) {
+
+                                    if (
+                                        !blob
+                                    ) {
+
+                                        reject(
+                                            new Error(
+                                                "Kunne ikke komprimere billedet."
+                                            )
+                                        );
+
+
+                                        return;
+
+                                    }
+
+
+                                    resolve(
+                                        blob
+                                    );
+
+                                },
+
+                                "image/jpeg",
+
+                                0.78
+
+                            );
+
+                        };
+
+
+                    image.onerror =
+                        reject;
+
+
+                    image.src =
+                        event.target.result;
+
+                };
+
+
+            reader.onerror =
+                reject;
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
 }
 
-/* ================= SØGNING + ANTAL ================= */
-function updateCounts(){
- const counts={Rødvin:0,Hvidvin:0,"Rosévin":0,Mousserende:0,Champagne:0,Portvin:0,Spiritus:0};
- (winesCache||[]).forEach(w=>{const q=Math.max(0,parseInt(w.quantity)||0);if(counts[w.type]!==undefined)counts[w.type]+=q});
- Object.keys(counts).forEach(t=>{const el=document.getElementById("count"+t);if(el)el.textContent=counts[t]});
+
+/* =====================================================
+   UPLOAD BILLEDE
+===================================================== */
+
+async function uploadWinePhoto(
+    file,
+    wineId
+) {
+
+    if (
+        !file
+    ) {
+
+        return null;
+
+    }
+
+
+    const compressed =
+        await compressImage(
+            file
+        );
+
+
+    const fileName =
+        "vin_"
+        + wineId
+        + ".jpg";
+
+
+    const metadata = {
+
+        name:
+            fileName,
+
+        mimeType:
+            "image/jpeg",
+
+        parents:
+            [googleFolderId]
+
+    };
+
+
+    const boundary =
+        "-------314159265358979323846";
+
+
+    const delimiter =
+        "\r\n--"
+        + boundary
+        + "\r\n";
+
+
+    const closeDelimiter =
+        "\r\n--"
+        + boundary
+        + "--";
+
+
+    const metadataPart =
+        delimiter
+        + "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        + JSON.stringify(
+            metadata
+        );
+
+
+    const imagePart =
+        delimiter
+        + "Content-Type: image/jpeg\r\n\r\n";
+
+
+    const body =
+        new Blob(
+            [
+
+                metadataPart,
+
+                imagePart,
+
+                compressed,
+
+                closeDelimiter
+
+            ],
+
+            {
+
+                type:
+                    "multipart/related; boundary="
+                    + boundary
+
+            }
+        );
+
+
+    const response =
+        await driveRequest(
+
+            "https://www.googleapis.com/upload/drive/v3/files"
+            + "?uploadType=multipart",
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "multipart/related; boundary="
+                        + boundary
+
+                },
+
+                body:
+                    body
+
+            }
+
+        );
+
+
+    const data =
+        await response.json();
+
+
+    return data.id;
+
 }
 
-async function showSearch(){
- showOnly("searchPage");
- document.getElementById("searchInput").value="";
- document.getElementById("searchResults").innerHTML='<div class="empty">☁️ Henter vinlager…</div>';
- try{
-  if(googleAccessToken)await loadWinesFromDrive(false);
-  else{
-   const local=localStorage.getItem("testWine");
-   winesCache=local?[JSON.parse(local)]:[];
-  }
-  renderSearchResults();
- }catch(e){document.getElementById("searchResults").innerHTML='<div class="empty">⚠️ Kunne ikke hente vinlageret.</div>'}
+
+/* =====================================================
+   FOTO PREVIEW
+===================================================== */
+
+function previewPhoto(
+    event
+) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (
+        !file
+    ) {
+
+        return;
+
+    }
+
+
+    const image =
+        document.getElementById(
+            "photoPreview"
+        );
+
+
+    image.src =
+        URL.createObjectURL(
+            file
+        );
+
+
+    image.style.display =
+        "block";
+
 }
 
-function renderSearchResults(){
- const box=document.getElementById("searchResults");
- if(!winesCache){box.innerHTML='<div class="empty">Ingen vine indlæst.</div>';return}
- const term=(document.getElementById("searchInput").value||"").toLowerCase().trim();
- const list=winesCache.filter(w=>[w.name,w.producer,w.country,w.barcode,w.location,w.type,w.year,w.notes].join(" ").toLowerCase().includes(term));
- if(!list.length){box.innerHTML='<div class="empty">Ingen vine fundet.</div>';return}
- box.innerHTML=list.map(w=>`
-  <div class="result">
-   <div class="resultTitle">${esc(w.name||"Ukendt vin")}</div>
-   <div class="resultMeta">${esc(w.producer||"")}${w.year?" · "+esc(w.year):""}${w.type?" · "+esc(w.type):""}</div>
-   <div class="resultMeta">Antal: <b>${Number(w.quantity)||0}</b>${w.country?" · "+esc(w.country):""}${w.location?" · "+esc(w.location):""}</div>
-   ${w.barcode?'<div class="resultMeta">EAN: '+esc(w.barcode)+'</div>':""}
-  </div>`).join("");
+
+/* =====================================================
+   SCANNER VARIABLER
+===================================================== */
+
+let scannerRunning = false;
+
+let lastCode = "";
+
+let detectionCount = 0;
+
+const REQUIRED_DETECTIONS = 2;
+
+
+/* =====================================================
+   OPSLAGS DATA
+===================================================== */
+
+let lookupWineData = null;
+
+
+/* =====================================================
+   START SCANNER
+===================================================== */
+
+function startScanner() {
+
+    showOnlyPage(
+        "scannerPage"
+    );
+
+
+    lastCode = "";
+
+    detectionCount = 0;
+
+
+    document.getElementById(
+        "scannerStatus"
+    ).textContent =
+        "Starter kamera…";
+
+
+    const config = {
+
+        inputStream: {
+
+            name:
+                "Live",
+
+            type:
+                "LiveStream",
+
+            target:
+                document.querySelector(
+                    "#camera"
+                ),
+
+            constraints: {
+
+                width: {
+
+                    min:
+                        640,
+
+                    ideal:
+                        1920
+
+                },
+
+                height: {
+
+                    min:
+                        480,
+
+                    ideal:
+                        1080
+
+                },
+
+                facingMode: {
+
+                    ideal:
+                        "environment"
+
+                },
+
+                aspectRatio: {
+
+                    ideal:
+                        16 / 9
+
+                },
+
+                focusMode:
+                    "continuous"
+
+            },
+
+            area: {
+
+                top:
+                    "25%",
+
+                right:
+                    "5%",
+
+                left:
+                    "5%",
+
+                bottom:
+                    "25%"
+
+            }
+
+        },
+
+
+        locator: {
+
+            patchSize:
+                "medium",
+
+            halfSample:
+                true
+
+        },
+
+
+        frequency:
+            15,
+
+
+        decoder: {
+
+            readers: [
+
+                "ean_reader",
+
+                "ean_8_reader"
+
+            ]
+
+        },
+
+
+        locate:
+            true,
+
+
+        numOfWorkers:
+
+            navigator.hardwareConcurrency
+
+            ?
+
+            Math.min(
+                navigator.hardwareConcurrency,
+                4
+            )
+
+            :
+
+            2
+
+    };
+
+
+    Quagga.init(
+
+        config,
+
+        function(error) {
+
+            if (
+                error
+            ) {
+
+                console.error(
+                    error
+                );
+
+
+                document.getElementById(
+                    "scannerStatus"
+                ).textContent =
+                    "Kameraet kunne ikke startes.";
+
+
+                return;
+
+            }
+
+
+            Quagga.start();
+
+
+            scannerRunning =
+                true;
+
+
+            document.getElementById(
+                "scannerStatus"
+            ).textContent =
+                "Scanner…";
+
+
+            Quagga.onDetected(
+                barcodeDetected
+            );
+
+        }
+
+    );
+
 }
 
-async function showCategory(type){
- await showSearch();
- document.getElementById("searchInput").value=type;
- renderSearchResults();
-}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 
-/* ================= NAVIGATION ================= */
-function showOnly(id){
- ["homePage","scannerPage","scanResult","addPage","searchPage"].forEach(x=>document.getElementById(x).style.display=x===id?"block":"none");
+/* =====================================================
+   STREGKODE FUNDET
+===================================================== */
+
+function barcodeDetected(
+    result
+) {
+
+    if (
+        !result ||
+        !result.codeResult ||
+        !result.codeResult.code
+    ) {
+
+        return;
+
+    }
+
+
+    const code =
+        result.codeResult.code;
+
+
+    const format =
+        result.codeResult.format;
+
+
+    if (
+        format !== "ean_13" &&
+        format !== "ean_8"
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        code === lastCode
+    ) {
+
+        detectionCount++;
+
+    }
+
+    else {
+
+        lastCode =
+            code;
+
+        detectionCount =
+            1;
+
+    }
+
+
+    document.getElementById(
+        "scannerStatus"
+    ).textContent =
+        "EAN fundet – bekræfter…";
+
+
+    if (
+        detectionCount >=
+        REQUIRED_DETECTIONS
+    ) {
+
+        finishScan(
+            code
+        );
+
+    }
+
 }
-function showHome(){stopScanner();showOnly("homePage");lookupWineData=null;updateCounts()}
-updateCounts();
+
+
+/* =====================================================
+   AFSLUT SCANNING
+===================================================== */
+
+function finishScan(
+    code
+) {
+
+    stopScanner();
+
+
+    lookupWineData =
+        null;
+
+
+    document.getElementById(
+        "barcode"
+    ).textContent =
+        code;
+
+
+    showOnlyPage(
+        "scanResult"
+    );
+
+
+    lookupWine(
+        code
+    );
+
+}
+
+
+/* =====================================================
+   STOP SCANNER
+===================================================== */
+
+function stopScanner() {
+
+    if (
+        !scannerRunning
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        Quagga.offDetected(
+            barcodeDetected
+        );
+
+
+        Quagga.stop();
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.log(
+            error
+        );
+
+    }
+
+
+    scannerRunning =
+        false;
+
+}
+
+
+/* =====================================================
+   LUK SCANNER
+===================================================== */
+
+function closeScanner() {
+
+    stopScanner();
+
+    showHome();
+
+}
+
+
+/* =====================================================
+   SCAN IGEN
+===================================================== */
+
+function scanAgain() {
+
+    lookupWineData =
+        null;
+
+
+    startScanner();
+
+}
+
+
+/* =====================================================
+   AUTOMATISK VINOPSLAG
+===================================================== */
+
+async function lookupWine(
+    code
+) {
+
+    const status =
+        document.getElementById(
+            "lookupStatus"
+        );
+
+
+    status.className =
+        "lookupStatus";
+
+
+    status.textContent =
+        "🔎 Søger efter vin...";
+
+
+    const fields = [
+
+        "code",
+
+        "product_name",
+
+        "product_name_da",
+
+        "generic_name",
+
+        "generic_name_da",
+
+        "brands",
+
+        "categories",
+
+        "categories_tags",
+
+        "countries",
+
+        "countries_tags",
+
+        "origins"
+
+    ].join(",");
+
+
+    const url =
+        "https://world.openfoodfacts.org/api/v3/product/"
+        + encodeURIComponent(
+            code
+        )
+        + "?product_type=all"
+        + "&lc=da"
+        + "&cc=dk"
+        + "&fields="
+        + encodeURIComponent(
+            fields
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method:
+                        "GET"
+                }
+            );
+
+
+        if (
+            !response.ok
+        ) {
+
+            if (
+                response.status === 404
+            ) {
+
+                lookupWineData =
+                    null;
+
+
+                status.className =
+                    "lookupStatus lookupWarning";
+
+
+                status.textContent =
+                    "⚠️ Stregkoden findes ikke "
+                    + "i databasen. Du kan indtaste "
+                    + "vinen manuelt.";
+
+
+                return;
+
+            }
+
+
+            throw new Error(
+                "HTTP "
+                + response.status
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const product =
+            data.product;
+
+
+        if (
+            !product
+        ) {
+
+            lookupWineData =
+                null;
+
+
+            status.className =
+                "lookupStatus lookupWarning";
+
+
+            status.textContent =
+                "⚠️ Vinen blev ikke fundet "
+                + "i databasen.";
+
+
+            return;
+
+        }
+
+
+        const name =
+
+            product.product_name_da
+            ||
+            product.product_name
+            ||
+            product.generic_name_da
+            ||
+            product.generic_name
+            ||
+            "";
+
+
+        const producer =
+            product.brands
+            ||
+            "";
+
+
+        const country =
+            extractCountry(
+                product
+            );
+
+
+        const type =
+            detectWineType(
+                product
+            );
+
+
+        lookupWineData = {
+
+            name:
+                name,
+
+            producer:
+                producer,
+
+            country:
+                country,
+
+            type:
+                type
+
+        };
+
+
+        status.className =
+            "lookupStatus lookupSuccess";
+
+
+        if (
+            name
+        ) {
+
+            status.textContent =
+                "✅ Vin fundet: "
+                + name
+                + ". Kontrollér oplysningerne "
+                + "før du gemmer.";
+
+        }
+
+        else {
+
+            status.textContent =
+                "✅ Stregkoden blev fundet, "
+                + "men der mangler vinoplysninger.";
+
+        }
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Vinopslag fejlede:",
+            error
+        );
+
+
+        lookupWineData =
+            null;
+
+
+        status.className =
+            "lookupStatus lookupError";
+
+
+        status.textContent =
+            "⚠️ Kunne ikke kontakte "
+            + "vin-databasen. "
+            + "Du kan stadig indtaste "
+            + "vinen manuelt.";
+
+    }
+
+}
+
+
+/* =====================================================
+   FIND LAND
+===================================================== */
+
+function extractCountry(
+    product
+) {
+
+    if (
+        Array.isArray(
+            product.countries_tags
+        )
+        &&
+        product.countries_tags.length
+    ) {
+
+        return cleanTaxonomyValue(
+            product.countries_tags[0]
+        );
+
+    }
+
+
+    if (
+        product.countries
+    ) {
+
+        return product.countries
+            .split(",")[0]
+            .trim();
+
+    }
+
+
+    if (
+        product.origins
+    ) {
+
+        return product.origins
+            .split(",")[0]
+            .trim();
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =====================================================
+   RENS TAXONOMI
+===================================================== */
+
+function cleanTaxonomyValue(
+    value
+) {
+
+    if (
+        !value
+    ) {
+
+        return "";
+
+    }
+
+
+    const parts =
+        value.split(":");
+
+
+    if (
+        parts.length > 1
+    ) {
+
+        return parts
+            .slice(1)
+            .join(":")
+            .replace(
+                /-/g,
+                " "
+            );
+
+    }
+
+
+    return value.replace(
+        /-/g,
+        " "
+    );
+
+}
+
+
+/* =====================================================
+   GENKENDEL VINTYPE
+===================================================== */
+
+function detectWineType(
+    product
+) {
+
+    const text = (
+
+        (
+            product.product_name
+            ||
+            ""
+        )
+
+        + " "
+
+        +
+
+        (
+            product.product_name_da
+            ||
+            ""
+        )
+
+        + " "
+
+        +
+
+        (
+            product.generic_name
+            ||
+            ""
+        )
+
+        + " "
+
+        +
+
+        (
+            product.generic_name_da
+            ||
+            ""
+        )
+
+        + " "
+
+        +
+
+        (
+            product.categories
+            ||
+            ""
+        )
+
+        + " "
+
+        +
+
+        (
+            Array.isArray(
+                product.categories_tags
+            )
+
+            ?
+
+            product.categories_tags.join(
+                " "
+            )
+
+            :
+
+            ""
+        )
+
+    ).toLowerCase();
+
+
+    /* CHAMPAGNE */
+
+    if (
+        text.includes(
+            "champagne"
+        )
+    ) {
+
+        return "Champagne";
+
+    }
+
+
+    /* PORTVIN */
+
+    if (
+
+        text.includes(
+            "port wine"
+        )
+
+        ||
+
+        text.includes(
+            "portwine"
+        )
+
+        ||
+
+        text.includes(
+            "portvin"
+        )
+
+        ||
+
+        text.includes(
+            "porto"
+        )
+
+    ) {
+
+        return "Portvin";
+
+    }
+
+
+    /* MOUSSERENDE */
+
+    if (
+
+        text.includes(
+            "sparkling"
+        )
+
+        ||
+
+        text.includes(
+            "mousser"
+        )
+
+        ||
+
+        text.includes(
+            "prosecco"
+        )
+
+        ||
+
+        text.includes(
+            "cava"
+        )
+
+        ||
+
+        text.includes(
+            "crémant"
+        )
+
+        ||
+
+        text.includes(
+            "cremant"
+        )
+
+        ||
+
+        text.includes(
+            "sekt"
+        )
+
+    ) {
+
+        return "Mousserende";
+
+    }
+
+
+    /* ROSÉ */
+
+    if (
+
+        text.includes(
+            "rosé"
+        )
+
+        ||
+
+        text.includes(
+            "rose wine"
+        )
+
+        ||
+
+        text.includes(
+            "rosé wine"
+        )
+
+        ||
+
+        text.includes(
+            "rosévin"
+        )
+
+        ||
+
+        text.includes(
+            "rosé vin"
+        )
+
+        ||
+
+        text.includes(
+            "vin rosé"
+        )
+
+        ||
+
+        text.includes(
+            "vino rosato"
+        )
+
+        ||
+
+        text.includes(
+            "rosato"
+        )
+
+        ||
+
+        text.includes(
+            "vin rosé"
+        )
+
+    ) {
+
+        return "Rosévin";
+
+    }
+
+
+    /* SPIRITUS */
+
+    if (
+
+        text.includes(
+            "spirit"
+        )
+
+        ||
+
+        text.includes(
+            "whisky"
+        )
+
+        ||
+
+        text.includes(
+            "whiskey"
+        )
+
+        ||
+
+        text.includes(
+            "vodka"
+        )
+
+        ||
+
+        text.includes(
+            "gin"
+        )
+
+        ||
+
+        text.includes(
+            "rum"
+        )
+
+        ||
+
+        text.includes(
+            "brandy"
+        )
+
+        ||
+
+        text.includes(
+            "cognac"
+        )
+
+        ||
+
+        text.includes(
+            "liqueur"
+        )
+
+        ||
+
+        text.includes(
+            "likør"
+        )
+
+    ) {
+
+        return "Spiritus";
+
+    }
+
+
+    /* HVIDVIN */
+
+    if (
+
+        text.includes(
+            "white wine"
+        )
+
+        ||
+
+        text.includes(
+            "white-wine"
+        )
+
+        ||
+
+        text.includes(
+            "hvidvin"
+        )
+
+        ||
+
+        text.includes(
+            "vino bianco"
+        )
+
+        ||
+
+        text.includes(
+            "vin blanc"
+        )
+
+        ||
+
+        text.includes(
+            "weisswein"
+        )
+
+        ||
+
+        text.includes(
+            "weißwein"
+        )
+
+    ) {
+
+        return "Hvidvin";
+
+    }
+
+
+    /* RØDVIN */
+
+    if (
+
+        text.includes(
+            "red wine"
+        )
+
+        ||
+
+        text.includes(
+            "red-wine"
+        )
+
+        ||
+
+        text.includes(
+            "rødvin"
+        )
+
+        ||
+
+        text.includes(
+            "vino rosso"
+        )
+
+        ||
+
+        text.includes(
+            "vin rouge"
+        )
+
+        ||
+
+        text.includes(
+            "rotwein"
+        )
+
+    ) {
+
+        return "Rødvin";
+
+    }
+
+
+    return "Rødvin";
+
+}
+
+
+/* =====================================================
+   FORTSÆT MED STREGKODE
+===================================================== */
+
+function continueWithBarcode() {
+
+    const code =
+        document.getElementById(
+            "barcode"
+        ).textContent;
+
+
+    showAddForm(
+        code,
+        lookupWineData
+    );
+
+}
+
+
+/* =====================================================
+   RESET FORMULAR
+===================================================== */
+
+function resetWineForm() {
+
+    editingWineId =
+        null;
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "➕ Tilføj vin";
+
+
+    const inputs =
+        document
+            .getElementById(
+                "addPage"
+            )
+            .querySelectorAll(
+                "input"
+            );
+
+
+    inputs.forEach(
+        function(input) {
+
+            if (
+                input.type ===
+                "file"
+            ) {
+
+                input.value =
+                    "";
+
+            }
+
+            else if (
+                input.type ===
+                "number"
+            ) {
+
+                if (
+                    input.id ===
+                    "wineQuantity"
+                ) {
+
+                    input.value =
+                        "1";
+
+                }
+
+                else {
+
+                    input.value =
+                        "";
+
+                }
+
+            }
+
+            else {
+
+                input.value =
+                    "";
+
+            }
+
+        }
+    );
+
+
+    document.getElementById(
+        "wineType"
+    ).selectedIndex =
+        0;
+
+
+    document.getElementById(
+        "wineNotes"
+    ).value =
+        "";
+
+
+    const preview =
+        document.getElementById(
+            "photoPreview"
+        );
+
+
+    preview.removeAttribute(
+        "src"
+    );
+
+
+    preview.style.display =
+        "none";
+
+
+    const formStatus =
+        document.getElementById(
+            "formLookupStatus"
+        );
+
+
+    formStatus.style.display =
+        "none";
+
+
+    formStatus.textContent =
+        "";
+
+
+    formStatus.className =
+        "lookupStatus";
+
+}
+
+
+/* =====================================================
+   VIS TILFØJ FORMULAR
+===================================================== */
+
+function showAddForm(
+    code,
+    wineData
+) {
+
+    showOnlyPage(
+        "addPage"
+    );
+
+
+    resetWineForm();
+
+
+    if (
+        code
+    ) {
+
+        document.getElementById(
+            "wineBarcode"
+        ).value =
+            code;
+
+    }
+
+
+    if (
+        wineData
+    ) {
+
+        document.getElementById(
+            "wineName"
+        ).value =
+            wineData.name
+            ||
+            "";
+
+
+        document.getElementById(
+            "wineProducer"
+        ).value =
+            wineData.producer
+            ||
+            "";
+
+
+        document.getElementById(
+            "wineCountry"
+        ).value =
+            wineData.country
+            ||
+            "";
+
+
+        document.getElementById(
+            "wineType"
+        ).value =
+            wineData.type
+            ||
+            "Rødvin";
+
+
+        const status =
+            document.getElementById(
+                "formLookupStatus"
+            );
+
+
+        status.style.display =
+            "block";
+
+
+        status.className =
+            "lookupStatus lookupSuccess";
+
+
+        status.textContent =
+            "✅ Oplysninger hentet automatisk. "
+            + "Kontrollér dem før du gemmer.";
+
+    }
+
+}
+
+
+/* =====================================================
+   REDIGER VIN
+===================================================== */
+
+function editWine(
+    wineId
+) {
+
+    const wine =
+        wines.find(
+            function(item) {
+
+                return String(
+                    item.id
+                )
+                ===
+                String(
+                    wineId
+                );
+
+            }
+        );
+
+
+    if (
+        !wine
+    ) {
+
+        alert(
+            "Vinen blev ikke fundet."
+        );
+
+        return;
+
+    }
+
+
+    editingWineId =
+        wine.id;
+
+
+    showOnlyPage(
+        "addPage"
+    );
+
+
+    document.getElementById(
+        "formTitle"
+    ).textContent =
+        "✏️ Rediger vin";
+
+
+    document.getElementById(
+        "wineBarcode"
+    ).value =
+        wine.barcode
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineName"
+    ).value =
+        wine.name
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineProducer"
+    ).value =
+        wine.producer
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineYear"
+    ).value =
+        wine.year
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineType"
+    ).value =
+        wine.type
+        ||
+        "Rødvin";
+
+
+    document.getElementById(
+        "wineCountry"
+    ).value =
+        wine.country
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineQuantity"
+    ).value =
+        getQuantity(
+            wine
+        );
+
+
+    document.getElementById(
+        "wineLocation"
+    ).value =
+        wine.location
+        ||
+        "";
+
+
+    document.getElementById(
+        "wineNotes"
+    ).value =
+        wine.notes
+        ||
+        "";
+
+
+    const status =
+        document.getElementById(
+            "formLookupStatus"
+        );
+
+
+    status.style.display =
+        "block";
+
+
+    status.className =
+        "lookupStatus";
+
+
+    status.textContent =
+        wine.photoFileId
+        ?
+
+        "📸 Vinen har allerede et billede. "
+        + "Vælg kun et nyt billede, hvis det skal erstattes."
+
+        :
+
+        "Ingen billede gemt for denne vin.";
+
+}
+
+
+/* =====================================================
+   GEM VIN
+===================================================== */
+
+async function saveWine() {
+
+    if (
+        !googleAccessToken
+    ) {
+
+        alert(
+            "Log ind med Google Drive først."
+        );
+
+        return;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveWineButton"
+        );
+
+
+    saveButton.disabled =
+        true;
+
+
+    saveButton.textContent =
+        "☁️ Gemmer…";
+
+
+    try {
+
+        await getOrCreateWineFolder();
+
+
+        /* ---------------------------------------------
+           OPDATER EKSISTERENDE VIN
+        --------------------------------------------- */
+
+        if (
+            editingWineId
+        ) {
+
+            const index =
+                wines.findIndex(
+                    function(item) {
+
+                        return String(
+                            item.id
+                        )
+                        ===
+                        String(
+                            editingWineId
+                        );
+
+                    }
+                );
+
+
+            if (
+                index < 0
+            ) {
+
+                throw new Error(
+                    "Vinen kunne ikke findes i lageret."
+                );
+
+            }
+
+
+            const oldWine =
+                wines[index];
+
+
+            const wine = {
+
+                ...oldWine,
+
+                barcode:
+                    document.getElementById(
+                        "wineBarcode"
+                    ).value.trim(),
+
+                name:
+                    document.getElementById(
+                        "wineName"
+                    ).value.trim(),
+
+                producer:
+                    document.getElementById(
+                        "wineProducer"
+                    ).value.trim(),
+
+                year:
+                    document.getElementById(
+                        "wineYear"
+                    ).value,
+
+                type:
+                    document.getElementById(
+                        "wineType"
+                    ).value,
+
+                country:
+                    document.getElementById(
+                        "wineCountry"
+                    ).value.trim(),
+
+                quantity:
+                    Math.max(
+                        0,
+                        parseInt(
+                            document.getElementById(
+                                "wineQuantity"
+                            ).value,
+                            10
+                        )
+                        ||
+                        0
+                    ),
+
+                location:
+                    document.getElementById(
+                        "wineLocation"
+                    ).value.trim(),
+
+                notes:
+                    document.getElementById(
+                        "wineNotes"
+                    ).value.trim(),
+
+                dateModified:
+                    new Date().toISOString()
+
+            };
+
+
+            const photoInput =
+                document.getElementById(
+                    "winePhoto"
+                );
+
+
+            const photoFile =
+                photoInput.files[0]
+                ||
+                null;
+
+
+            /*
+               Upload kun nyt billede er valgt.
+            */
+
+            if (
+                photoFile
+            ) {
+
+                const status =
+                    document.getElementById(
+                        "formLookupStatus"
+                    );
+
+
+                status.style.display =
+                    "block";
+
+
+                status.className =
+                    "lookupStatus";
+
+
+                status.textContent =
+                    "☁️ Gemmer nyt billede…";
+
+
+                wine.photoFileId =
+                    await uploadWinePhoto(
+                        photoFile,
+                        wine.id
+                    );
+
+            }
+
+
+            wines[index] =
+                wine;
+
+
+            await saveWinesToDrive(
+                wines
+            );
+
+
+            updateFrontPageCounts();
+
+
+            alert(
+                "✅ Vinen er opdateret."
+            );
+
+
+            showHome();
+
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           NY VIN
+        --------------------------------------------- */
+
+        const wine = {
+
+            id:
+                Date.now().toString(),
+
+            barcode:
+                document.getElementById(
+                    "wineBarcode"
+                ).value.trim(),
+
+            name:
+                document.getElementById(
+                    "wineName"
+                ).value.trim(),
+
+            producer:
+                document.getElementById(
+                    "wineProducer"
+                ).value.trim(),
+
+            year:
+                document.getElementById(
+                    "wineYear"
+                ).value,
+
+            type:
+                document.getElementById(
+                    "wineType"
+                ).value,
+
+            country:
+                document.getElementById(
+                    "wineCountry"
+                ).value.trim(),
+
+            quantity:
+                Math.max(
+                    0,
+                    parseInt(
+                        document.getElementById(
+                            "wineQuantity"
+                        ).value,
+                        10
+                    )
+                    ||
+                    0
+                ),
+
+            location:
+                document.getElementById(
+                    "wineLocation"
+                ).value.trim(),
+
+            notes:
+                document.getElementById(
+                    "wineNotes"
+                ).value.trim(),
+
+            photoFileId:
+                null,
+
+            dateAdded:
+                new Date().toISOString()
+
+        };
+
+
+        const photoInput =
+            document.getElementById(
+                "winePhoto"
+            );
+
+
+        const photoFile =
+            photoInput.files[0]
+            ||
+            null;
+
+
+        /*
+           Upload billede først.
+        */
+
+        if (
+            photoFile
+        ) {
+
+            const status =
+                document.getElementById(
+                    "formLookupStatus"
+                );
+
+
+            status.style.display =
+                "block";
+
+
+            status.className =
+                "lookupStatus";
+
+
+            status.textContent =
+                "☁️ Gemmer billede…";
+
+
+            wine.photoFileId =
+                await uploadWinePhoto(
+                    photoFile,
+                    wine.id
+                );
+
+        }
+
+
+        /*
+           Tilføj til vores lokale lager.
+        */
+
+        wines.push(
+            wine
+        );
+
+
+        /*
+           Gem hele lageret.
+        */
+
+        document.getElementById(
+            "formLookupStatus"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "formLookupStatus"
+        ).textContent =
+            "☁️ Gemmer vinlager…";
+
+
+        await saveWinesToDrive(
+            wines
+        );
+
+
+        updateFrontPageCounts();
+
+
+        alert(
+            "✅ Vinen er gemt i Google Drive."
+        );
+
+
+        showHome();
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Google Drive fejl:",
+            error
+        );
+
+
+        alert(
+            "⚠️ Der opstod en fejl ved "
+            + "gemning til Google Drive.\n\n"
+            + error.message
+        );
+
+    }
+
+    finally {
+
+        saveButton.disabled =
+            false;
+
+
+        saveButton.textContent =
+            "💾 Gem vin";
+
+    }
+
+}
+
+
+/* =====================================================
+   SLET VIN
+===================================================== */
+
+async function deleteWine(
+    wineId
+) {
+
+    const wine =
+        wines.find(
+            function(item) {
+
+                return String(
+                    item.id
+                )
+                ===
+                String(
+                    wineId
+                );
+
+            }
+        );
+
+
+    if (
+        !wine
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "Vil du slette:\n\n"
+            + (
+                wine.name
+                ||
+                "Denne vin"
+            )
+            + "?"
+        );
+
+
+    if (
+        !confirmed
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !googleAccessToken
+    ) {
+
+        alert(
+            "Log ind på Google Drive først."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        wines =
+            wines.filter(
+                function(item) {
+
+                    return String(
+                        item.id
+                    )
+                    !==
+                    String(
+                        wineId
+                    );
+
+                }
+            );
+
+
+        await saveWinesToDrive(
+            wines
+        );
+
+
+        updateFrontPageCounts();
+
+
+        renderCurrentPage();
+
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+
+        alert(
+            "⚠️ Vinen kunne ikke slettes.\n\n"
+            + error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ÆNDR ANTAL
+===================================================== */
+
+async function changeQuantity(
+    wineId,
+    amount
+) {
+
+    const wine =
+        wines.find(
+            function(item) {
+
+                return String(
+                    item.id
+                )
+                ===
+                String(
+                    wineId
+                );
+
+            }
+        );
+
+
+    if (
+        !wine
+    ) {
+
+        return;
+
+    }
+
+
+    const oldQuantity =
+        getQuantity(
+            wine
+        );
+
+
+    const newQuantity =
+        Math.max(
+            0,
+            oldQuantity + amount
+        );
+
+
+    if (
+        newQuantity ===
+        oldQuantity
+    ) {
+
+        return;
+
+    }
+
+
+    wine.quantity =
+        newQuantity;
+
+
+    /*
+       Opdater brugerfladen straks.
+    */
+
+    updateFrontPageCounts();
+
+    renderCurrentPage();
+
+
+    /*
+       Gem i baggrunden.
+    */
+
+    if (
+        googleAccessToken
+    ) {
+
+        try {
+
+            await saveWinesToDrive(
+                wines
+            );
+
+        }
+
+        catch (
+            error
+        ) {
+
+            console.error(
+                error
+            );
+
+
+            alert(
+                "⚠️ Antallet blev ændret lokalt, "
+                + "men kunne ikke gemmes på Google Drive.\n\n"
+                + error.message
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   VIS KUN ÉN SIDE
+===================================================== */
+
+function showOnlyPage(
+    pageId
+) {
+
+    stopScanner();
+
+
+    const pages =
+        document.querySelectorAll(
+            ".page"
+        );
+
+
+    pages.forEach(
+        function(page) {
+
+            page.style.display =
+                "none";
+
+        }
+    );
+
+
+    document.getElementById(
+        pageId
+    ).style.display =
+        "block";
+
+}
+
+
+/* =====================================================
+   FORSIDE
+===================================================== */
+
+function showHome() {
+
+    stopScanner();
+
+
+    showOnlyPage(
+        "homePage"
+    );
+
+
+    lookupWineData =
+        null;
+
+
+    updateFrontPageCounts();
+
+}
+
+
+/* =====================================================
+   OPDATER ANTAL PÅ FORSIDEN
+===================================================== */
+
+function updateFrontPageCounts() {
+
+    const categories = [
+
+        "Rødvin",
+
+        "Hvidvin",
+
+        "Rosévin",
+
+        "Mousserende",
+
+        "Champagne",
+
+        "Portvin",
+
+        "Spiritus"
+
+    ];
+
+
+    categories.forEach(
+        function(category) {
+
+            const count =
+                wines
+                    .filter(
+                        function(wine) {
+
+                            return wine.type
+                                ===
+                                category;
+
+                        }
+                    )
+                    .reduce(
+                        function(total, wine) {
+
+                            return total +
+                                getQuantity(
+                                    wine
+                                );
+
+                        },
+                        0
+                    );
+
+
+            const elementId =
+                "count"
+                +
+                category;
+
+
+            const element =
+                document.getElementById(
+                    elementId
+                );
+
+
+            if (
+                element
+            ) {
+
+                element.textContent =
+                    count;
+
+            }
+
+        }
+    );
+
+
+    const status =
+        document.getElementById(
+            "inventoryStatus"
+        );
+
+
+    if (
+        status &&
+        googleAccessToken
+    ) {
+
+        status.textContent =
+            "📦 "
+            + totalBottleCount(
+                wines
+            )
+            + " flasker på lager";
+
+    }
+
+}
+
+
+/* =====================================================
+   LAGEROVERSIGT
+===================================================== */
+
+async function showInventoryPage() {
+
+    if (
+        googleAccessToken &&
+        wines.length === 0
+    ) {
+
+        await refreshWineInventory();
+
+    }
+
+
+    showOnlyPage(
+        "inventoryPage"
+    );
+
+
+    document.getElementById(
+        "inventoryPageInfo"
+    ).textContent =
+        totalBottleCount(
+            wines
+        )
+        + " flasker på lager";
+
+
+    renderWineList(
+        wines,
+        "inventoryResults"
+    );
+
+}
+
+
+/* =====================================================
+   SØGESIDE
+===================================================== */
+
+async function showSearchPage() {
+
+    if (
+        googleAccessToken &&
+        wines.length === 0
+    ) {
+
+        await refreshWineInventory();
+
+    }
+
+
+    showOnlyPage(
+        "searchPage"
+    );
+
+
+    const input =
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    input.value =
+        "";
+
+
+    document.getElementById(
+        "searchInfo"
+    ).textContent =
+        wines.length
+        + " forskellige vine i lageret";
+
+
+    document.getElementById(
+        "searchResults"
+    ).innerHTML =
+        "";
+
+
+    setTimeout(
+        function() {
+
+            input.focus();
+
+        },
+        100
+    );
+
+}
+
+
+/* =====================================================
+   SØGNING
+===================================================== */
+
+function performSearch() {
+
+    const query =
+        document.getElementById(
+            "searchInput"
+        ).value
+        .trim()
+        .toLowerCase();
+
+
+    if (
+        !query
+    ) {
+
+        document.getElementById(
+            "searchInfo"
+        ).textContent =
+            wines.length
+            + " forskellige vine i lageret";
+
+
+        document.getElementById(
+            "searchResults"
+        ).innerHTML =
+            "";
+
+
+        return;
+
+    }
+
+
+    const results =
+        wines.filter(
+            function(wine) {
+
+                const searchable = [
+
+                    wine.name,
+
+                    wine.producer,
+
+                    wine.barcode,
+
+                    wine.country,
+
+                    wine.location,
+
+                    wine.notes,
+
+                    wine.type,
+
+                    wine.year
+
+                ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+
+                return searchable.includes(
+                    query
+                );
+
+            }
+        );
+
+
+    document.getElementById(
+        "searchInfo"
+    ).textContent =
+        results.length
+        + " vin"
+        + (
+            results.length === 1
+            ? ""
+            : "e"
+        )
+        + " fundet";
+
+
+    renderWineList(
+        results,
+        "searchResults"
+    );
+
+}
+
+
+/* =====================================================
+   KATEGORI
+===================================================== */
+
+function showCategory(
+    category
+) {
+
+    currentCategory =
+        category;
+
+
+    showOnlyPage(
+        "categoryPage"
+    );
+
+
+    const categoryWines =
+        wines.filter(
+            function(wine) {
+
+                return wine.type
+                    ===
+                    category;
+
+            }
+        );
+
+
+    const bottleCount =
+        totalBottleCount(
+            categoryWines
+        );
+
+
+    document.getElementById(
+        "categoryHeader"
+    ).innerHTML =
+
+        "<div class='categoryHeaderTitle'>"
+        + category
+        + "</div>"
+
+        +
+
+        "<div class='categoryHeaderCount'>"
+        + bottleCount
+        + " flasker · "
+        + categoryWines.length
+        + " forskellige vine"
+        + "</div>";
+
+
+    renderWineList(
+        categoryWines,
+        "categoryResults"
+    );
+
+}
+
+
+/* =====================================================
+   RENDER VINALISTE
+===================================================== */
+
+function renderWineList(
+    list,
+    containerId
+) {
+
+    const container =
+        document.getElementById(
+            containerId
+        );
+
+
+    if (
+        !container
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !list ||
+        list.length === 0
+    ) {
+
+        container.innerHTML =
+
+            "<div class='emptyState'>"
+            + "🍷 Ingen vine fundet."
+            + "</div>";
+
+        return;
+
+    }
+
+
+    /*
+       Sortér alfabetisk efter navn.
+    */
+
+    const sorted =
+        [...list].sort(
+            function(a, b) {
+
+                return (
+                    (
+                        a.name
+                        ||
+                        ""
+                    )
+                    .toLowerCase()
+                )
+                .localeCompare(
+                    (
+                        b.name
+                        ||
+                        ""
+                    )
+                    .toLowerCase(),
+                    "da"
+                );
+
+            }
+        );
+
+
+    container.innerHTML =
+        sorted
+            .map(
+                createWineCard
+            )
+            .join("");
+
+}
+
+
+/* =====================================================
+   VINKORT
+===================================================== */
+
+function createWineCard(
+    wine
+) {
+
+    const quantity =
+        getQuantity(
+            wine
+        );
+
+
+    const name =
+        escapeHtml(
+            wine.name
+            ||
+            "Ukendt vin"
+        );
+
+
+    const producer =
+        escapeHtml(
+            wine.producer
+            ||
+            ""
+        );
+
+
+    let meta = "";
+
+
+    if (
+        wine.year
+    ) {
+
+        meta +=
+            "Årgang: "
+            + escapeHtml(
+                wine.year
+            )
+            + "<br>";
+
+    }
+
+
+    if (
+        wine.country
+    ) {
+
+        meta +=
+            "Land: "
+            + escapeHtml(
+                wine.country
+            )
+            + "<br>";
+
+    }
+
+
+    if (
+        wine.type
+    ) {
+
+        meta +=
+            "Type: "
+            + escapeHtml(
+                wine.type
+            )
+            + "<br>";
+
+    }
+
+
+    if (
+        wine.barcode
+    ) {
+
+        meta +=
+            "EAN: "
+            + escapeHtml(
+                wine.barcode
+            )
+            + "<br>";
+
+    }
+
+
+    if (
+        wine.location
+    ) {
+
+        meta +=
+            "📍 "
+            + escapeHtml(
+                wine.location
+            )
+            + "<br>";
+
+    }
+
+
+    if (
+        wine.notes
+    ) {
+
+        meta +=
+            "📝 "
+            + escapeHtml(
+                wine.notes
+            );
+
+    }
+
+
+    let photoHtml =
+        "";
+
+
+    if (
+        wine.photoFileId
+    ) {
+
+        photoHtml =
+
+            "<img "
+            + "class='winePhoto' "
+            + "src='https://drive.google.com/uc?export=view&id="
+            + encodeURIComponent(
+                wine.photoFileId
+            )
+            + "' "
+            + "alt='Billede af "
+            + name
+            + "' "
+            + "loading='lazy'>";
+
+    }
+
+
+    return
+
+        "<div class='wineCard'>"
+
+        +
+
+        "<div class='wineCardHeader'>"
+
+        +
+
+        "<div>"
+
+        +
+
+        "<div class='wineCardName'>"
+        + name
+        + "</div>"
+
+        +
+
+        (
+            producer
+            ?
+
+            "<div class='wineCardProducer'>"
+            + producer
+            + "</div>"
+
+            :
+
+            ""
+        )
+
+        +
+
+        "</div>"
+
+        +
+
+        "</div>"
+
+        +
+
+        (
+            meta
+            ?
+
+            "<div class='wineCardMeta'>"
+            + meta
+            + "</div>"
+
+            :
+
+            ""
+        )
+
+        +
+
+        photoHtml
+
+        +
+
+        "<div class='quantityBox'>"
+
+        +
+
+        "<strong>Antal på lager</strong>"
+
+        +
+
+        "<div class='quantityControls'>"
+
+        +
+
+        "<button "
+        + "onclick=\"changeQuantity('"
+        + escapeJs(
+            wine.id
+        )
+        + "', -1)\">"
+        + "−"
+        + "</button>"
+
+        +
+
+        "<div class='quantityNumber'>"
+        + quantity
+        + "</div>"
+
+        +
+
+        "<button "
+        + "onclick=\"changeQuantity('"
+        + escapeJs(
+            wine.id
+        )
+        + "', 1)\">"
+        + "+"
+        + "</button>"
+
+        +
+
+        "</div>"
+
+        +
+
+        "</div>"
+
+        +
+
+        "<div class='cardActions'>"
+
+        +
+
+        "<button "
+        + "class='editButton' "
+        + "onclick=\"editWine('"
+        + escapeJs(
+            wine.id
+        )
+        + "')\">"
+        + "✏️ Rediger"
+        + "</button>"
+
+        +
+
+        "<button "
+        + "class='deleteButton' "
+        + "onclick=\"deleteWine('"
+        + escapeJs(
+            wine.id
+        )
+        + "')\">"
+        + "🗑️ Slet"
+        + "</button>"
+
+        +
+
+        "</div>"
+
+        +
+
+        "</div>";
+
+}
+
+
+/* =====================================================
+   HTML SIKKERHED
+===================================================== */
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+/* =====================================================
+   JAVASCRIPT SIKKERHED
+===================================================== */
+
+function escapeJs(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    )
+    .replace(
+        /\\/g,
+        "\\\\"
+    )
+    .replace(
+        /'/g,
+        "\\'"
+    );
+
+}
+
+
+/* =====================================================
+   GENRENDER AKTUEL SIDE
+===================================================== */
+
+function renderCurrentPage() {
+
+    const visiblePages =
+        document.querySelectorAll(
+            ".page"
+        );
+
+
+    let visiblePageId =
+        null;
+
+
+    visiblePages.forEach(
+        function(page) {
+
+            if (
+                page.style.display ===
+                "block"
+            ) {
+
+                visiblePageId =
+                    page.id;
+
+            }
+
+        }
+    );
+
+
+    if (
+        visiblePageId ===
+        "inventoryPage"
+    ) {
+
+        document.getElementById(
+            "inventoryPageInfo"
+        ).textContent =
+            totalBottleCount(
+                wines
+            )
+            + " flasker på lager";
+
+
+        renderWineList(
+            wines,
+            "inventoryResults"
+        );
+
+    }
+
+
+    else if (
+        visiblePageId ===
+        "categoryPage"
+    ) {
+
+        showCategory(
+            currentCategory
+        );
+
+    }
+
+
+    else if (
+        visiblePageId ===
+        "searchPage"
+    ) {
+
+        performSearch();
+
+    }
+
+}
+
+
+/* =====================================================
+   STARTAPP
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        updateFrontPageCounts();
+
+    }
+);
+
 </script>
+
+
 </body>
+
 </html>
