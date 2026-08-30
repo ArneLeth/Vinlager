@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Google Drive test</title>
+
+<script src="https://accounts.google.com/gsi/client"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    padding: 30px;
+    text-align: center;
+}
+
+button {
+    padding: 15px 25px;
+    font-size: 17px;
+    margin-top: 20px;
+}
+
+#status {
+    margin-top: 25px;
+    padding: 15px;
+    background: #f2f2f2;
+    border-radius: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>🍷 Mit Vinlager</h1>
+
+<p>Google Drive forbindelse</p>
+
+<button onclick="loginGoogle()">
+    Log ind med Google
+</button>
+
+<div id="status">
+    Ikke logget ind
+</div>
+
+
+<script>
+
+const CLIENT_ID =
+"701927788585-hfkv438gs0ljn6ln9c05q6p9lsns9j6i.apps.googleusercontent.com";
+
+
+const SCOPES =
+"https://www.googleapis.com/auth/drive.file";
+
+
+let tokenClient;
+
+let accessToken = null;
+
+
+function loginGoogle() {
+
+    tokenClient =
+        google.accounts.oauth2.initTokenClient({
+
+            client_id: CLIENT_ID,
+
+            scope: SCOPES,
+
+            callback: async function(response) {
+
+                if (response.error) {
+
+                    console.error(response);
+
+                    document.getElementById(
+                        "status"
+                    ).textContent =
+                        "❌ Google-login fejlede.";
+
+                    return;
+                }
+
+
+                accessToken =
+                    response.access_token;
+
+
+                document.getElementById(
+                    "status"
+                ).textContent =
+                    "✅ Google-login lykkedes. Tester Google Drive…";
+
+
+                await testDrive();
+
+            }
+
+        });
+
+
+    tokenClient.requestAccessToken();
+
+}
+
+
+async function testDrive() {
+
+    try {
+
+        const response = await fetch(
+            "https://www.googleapis.com/drive/v3/files"
+            + "?pageSize=10"
+            + "&fields=files(id,name,mimeType)",
+            {
+
+                headers: {
+
+                    Authorization:
+                        "Bearer " + accessToken
+
+                }
+
+            }
+        );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Google Drive svar:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error?.message
+                ||
+                "Google Drive fejl"
+            );
+
+        }
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "✅ Forbindelse til Google Drive virker!";
+
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "❌ Google Drive fejl: "
+            + error.message;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
