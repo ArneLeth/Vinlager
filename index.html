@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="da">
 
@@ -23,6 +24,11 @@
 <!-- Quagga2 - stregkodescanner -->
 
 <script src="https://unpkg.com/@ericblade/quagga2@1.12.1/dist/quagga.min.js"></script>
+
+
+<!-- Google Identity Services -->
+
+<script src="https://accounts.google.com/gsi/client"></script>
 
 
 <style>
@@ -115,6 +121,16 @@ button {
     color: #222;
 }
 
+.google {
+    background: #4285f4;
+    color: white;
+}
+
+.logout {
+    background: #eee;
+    color: #444;
+}
+
 
 /* =====================================================
    SIDER
@@ -134,6 +150,25 @@ button {
 
 #scanResult {
     display: none;
+}
+
+
+/* =====================================================
+   GOOGLE STATUS
+===================================================== */
+
+#googleStatus {
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0 15px;
+
+    border-radius: 10px;
+
+    background: #eee;
+
+    color: #666;
+
+    font-size: 14px;
 }
 
 
@@ -345,6 +380,34 @@ button {
     <div class="subtitle">
         Dit private vinlager
     </div>
+
+
+    <!-- GOOGLE DRIVE -->
+
+    <div id="googleStatus">
+        ☁️ Ikke forbundet til Google Drive
+    </div>
+
+
+    <button
+        id="googleLoginButton"
+        class="google"
+        onclick="loginGoogle()">
+
+        ☁️ Log ind med Google Drive
+
+    </button>
+
+
+    <button
+        id="googleLogoutButton"
+        class="logout"
+        onclick="logoutGoogle()"
+        style="display:none;">
+
+        Log ud af Google
+
+    </button>
 
 
     <button
@@ -729,6 +792,905 @@ button {
 
 
 /* =====================================================
+   GOOGLE DRIVE
+===================================================== */
+
+const GOOGLE_CLIENT_ID =
+"701927788585-hfkv438gs0ljn6ln9c05q6p9lsns9j6i.apps.googleusercontent.com";
+
+
+const GOOGLE_SCOPE =
+"https://www.googleapis.com/auth/drive.file";
+
+
+let googleTokenClient = null;
+
+let googleAccessToken = null;
+
+let googleFolderId =
+    localStorage.getItem(
+        "vinlagerGoogleFolderId"
+    );
+
+
+/* =====================================================
+   GOOGLE LOGIN
+===================================================== */
+
+function loginGoogle() {
+
+
+    if (
+        !window.google ||
+        !google.accounts ||
+        !google.accounts.oauth2
+    ) {
+
+        alert(
+            "Google-login er ikke indlæst endnu. " +
+            "Prøv igen om et øjeblik."
+        );
+
+        return;
+
+    }
+
+
+    googleTokenClient =
+        google.accounts.oauth2.initTokenClient({
+
+            client_id:
+                GOOGLE_CLIENT_ID,
+
+            scope:
+                GOOGLE_SCOPE,
+
+            callback:
+                async function(response) {
+
+
+                    if (
+                        response.error
+                    ) {
+
+                        console.error(
+                            "Google login fejl:",
+                            response
+                        );
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "❌ Google-login fejlede.";
+
+                        return;
+
+                    }
+
+
+                    googleAccessToken =
+                        response.access_token;
+
+
+                    document.getElementById(
+                        "googleStatus"
+                    ).textContent =
+                        "✅ Forbundet til Google Drive";
+
+
+                    document.getElementById(
+                        "googleLoginButton"
+                    ).style.display =
+                        "none";
+
+
+                    document.getElementById(
+                        "googleLogoutButton"
+                    ).style.display =
+                        "block";
+
+
+                    /*
+                       Kontroller/opret
+                       Vinlager-mappen.
+                    */
+
+                    try {
+
+                        await getOrCreateWineFolder();
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "✅ Google Drive klar – Mit Vinlager";
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            error
+                        );
+
+
+                        document.getElementById(
+                            "googleStatus"
+                        ).textContent =
+                            "⚠️ Google er logget ind, "
+                            + "men Drive kunne ikke åbnes.";
+
+                    }
+
+                }
+
+        });
+
+
+    googleTokenClient.requestAccessToken({
+        prompt: "consent"
+    });
+
+}
+
+
+/* =====================================================
+   GOOGLE LOGOUT
+===================================================== */
+
+function logoutGoogle() {
+
+
+    if (
+        googleAccessToken &&
+        window.google
+    ) {
+
+        google.accounts.oauth2.revoke(
+            googleAccessToken
+        );
+
+    }
+
+
+    googleAccessToken =
+        null;
+
+
+    document.getElementById(
+        "googleStatus"
+    ).textContent =
+        "☁️ Ikke forbundet til Google Drive";
+
+
+    document.getElementById(
+        "googleLoginButton"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "googleLogoutButton"
+    ).style.display =
+        "none";
+
+}
+
+
+/* =====================================================
+   GOOGLE DRIVE API
+===================================================== */
+
+async function driveRequest(
+    url,
+    options = {}
+) {
+
+
+    if (
+        !googleAccessToken
+    ) {
+
+        throw new Error(
+            "Ikke logget ind på Google Drive."
+        );
+
+    }
+
+
+    const headers =
+        options.headers || {};
+
+
+    headers.Authorization =
+        "Bearer "
+        + googleAccessToken;
+
+
+    options.headers =
+        headers;
+
+
+    const response =
+        await fetch(
+            url,
+            options
+        );
+
+
+    if (
+        !response.ok
+    ) {
+
+        let errorText =
+            "";
+
+        try {
+
+            const errorData =
+                await response.json();
+
+            errorText =
+                errorData.error?.message
+                ||
+                JSON.stringify(
+                    errorData
+                );
+
+        }
+
+        catch {
+
+            errorText =
+                await response.text();
+
+        }
+
+
+        throw new Error(
+            errorText
+        );
+
+    }
+
+
+    return response;
+
+}
+
+
+/* =====================================================
+   FIND / OPRET VINLAGER-MAPPE
+===================================================== */
+
+async function getOrCreateWineFolder() {
+
+
+    /*
+       Hvis vi allerede kender
+       mappen, bruger vi den.
+    */
+
+    if (
+        googleFolderId
+    ) {
+
+        return googleFolderId;
+
+    }
+
+
+    /*
+       Søg efter en mappe,
+       som appen selv har adgang til.
+    */
+
+    const searchUrl =
+        "https://www.googleapis.com/drive/v3/files"
+        + "?q="
+        + encodeURIComponent(
+            "name='Mit Vinlager'"
+            + " and mimeType='application/vnd.google-apps.folder'"
+            + " and trashed=false"
+        )
+        + "&spaces=drive"
+        + "&fields=files(id,name)";
+
+
+    const response =
+        await driveRequest(
+            searchUrl
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        data.files &&
+        data.files.length > 0
+    ) {
+
+        googleFolderId =
+            data.files[0].id;
+
+
+        localStorage.setItem(
+            "vinlagerGoogleFolderId",
+            googleFolderId
+        );
+
+
+        return googleFolderId;
+
+    }
+
+
+    /*
+       Opret mappen.
+    */
+
+    const createResponse =
+        await driveRequest(
+            "https://www.googleapis.com/drive/v3/files",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        name:
+                            "Mit Vinlager",
+
+                        mimeType:
+                            "application/vnd.google-apps.folder"
+
+                    })
+
+            }
+        );
+
+
+    const folder =
+        await createResponse.json();
+
+
+    googleFolderId =
+        folder.id;
+
+
+    localStorage.setItem(
+        "vinlagerGoogleFolderId",
+        googleFolderId
+    );
+
+
+    return googleFolderId;
+
+}
+
+
+/* =====================================================
+   FIND FIL
+===================================================== */
+
+async function findDriveFile(
+    fileName
+) {
+
+
+    const query =
+        "name='"
+        + fileName.replace(
+            /'/g,
+            "\\'"
+        )
+        + "'"
+        + " and '"
+        + googleFolderId
+        + "' in parents"
+        + " and trashed=false";
+
+
+    const url =
+        "https://www.googleapis.com/drive/v3/files"
+        + "?q="
+        + encodeURIComponent(
+            query
+        )
+        + "&spaces=drive"
+        + "&fields=files(id,name,mimeType)";
+
+
+    const response =
+        await driveRequest(
+            url
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        data.files &&
+        data.files.length
+    ) {
+
+        return data.files[0];
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =====================================================
+   HENT WINES.JSON
+===================================================== */
+
+async function loadWinesFromDrive() {
+
+
+    const file =
+        await findDriveFile(
+            "wines.json"
+        );
+
+
+    if (!file) {
+
+        return [];
+
+    }
+
+
+    const response =
+        await driveRequest(
+            "https://www.googleapis.com/drive/v3/files/"
+            + file.id
+            + "?alt=media"
+        );
+
+
+    const text =
+        await response.text();
+
+
+    try {
+
+        return JSON.parse(
+            text
+        );
+
+    }
+
+    catch {
+
+        return [];
+
+    }
+
+}
+
+
+/* =====================================================
+   GEM WINES.JSON
+===================================================== */
+
+async function saveWinesToDrive(
+    wines
+) {
+
+
+    const json =
+        JSON.stringify(
+            wines,
+            null,
+            2
+        );
+
+
+    const existingFile =
+        await findDriveFile(
+            "wines.json"
+        );
+
+
+    const metadata = {
+
+        name:
+            "wines.json",
+
+        mimeType:
+            "application/json",
+
+        parents:
+            existingFile
+            ?
+            undefined
+            :
+            [googleFolderId]
+
+    };
+
+
+    const boundary =
+        "-------314159265358979323846";
+
+
+    const delimiter =
+        "\r\n--"
+        + boundary
+        + "\r\n";
+
+
+    const closeDelimiter =
+        "\r\n--"
+        + boundary
+        + "--";
+
+
+    const body =
+        delimiter
+        + "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        + JSON.stringify(
+            metadata
+        )
+        + delimiter
+        + "Content-Type: application/json\r\n\r\n"
+        + json
+        + closeDelimiter;
+
+
+    let url;
+
+
+    let method;
+
+
+    if (
+        existingFile
+    ) {
+
+        url =
+            "https://www.googleapis.com/upload/drive/v3/files/"
+            + existingFile.id
+            + "?uploadType=multipart";
+
+
+        method =
+            "PATCH";
+
+    }
+
+    else {
+
+        url =
+            "https://www.googleapis.com/upload/drive/v3/files"
+            + "?uploadType=multipart";
+
+
+        method =
+            "POST";
+
+    }
+
+
+    await driveRequest(
+        url,
+        {
+
+            method:
+
+                method,
+
+            headers: {
+
+                "Content-Type":
+                    "multipart/related; boundary="
+                    + boundary
+
+            },
+
+            body:
+                body
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   KOMPRIMER BILLEDE
+===================================================== */
+
+function compressImage(
+    file
+) {
+
+
+    return new Promise(
+        function(resolve, reject) {
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function(event) {
+
+
+                    const image =
+                        new Image();
+
+
+                    image.onload =
+                        function() {
+
+
+                            const MAX_WIDTH =
+                                1200;
+
+
+                            let width =
+                                image.width;
+
+
+                            let height =
+                                image.height;
+
+
+                            if (
+                                width >
+                                MAX_WIDTH
+                            ) {
+
+                                height =
+                                    height
+                                    *
+                                    MAX_WIDTH
+                                    /
+                                    width;
+
+                                width =
+                                    MAX_WIDTH;
+
+                            }
+
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+
+                            canvas.width =
+                                width;
+
+
+                            canvas.height =
+                                height;
+
+
+                            const context =
+                                canvas.getContext(
+                                    "2d"
+                                );
+
+
+                            context.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+
+                            canvas.toBlob(
+
+                                function(blob) {
+
+                                    if (
+                                        !blob
+                                    ) {
+
+                                        reject(
+                                            new Error(
+                                                "Kunne ikke komprimere billedet."
+                                            )
+                                        );
+
+                                        return;
+
+                                    }
+
+
+                                    resolve(
+                                        blob
+                                    );
+
+                                },
+
+                                "image/jpeg",
+
+                                0.78
+
+                            );
+
+                        };
+
+
+                    image.onerror =
+                        reject;
+
+
+                    image.src =
+                        event.target.result;
+
+                };
+
+
+            reader.onerror =
+                reject;
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   UPLOAD BILLEDE TIL GOOGLE DRIVE
+===================================================== */
+
+async function uploadWinePhoto(
+    file,
+    wineId
+) {
+
+
+    if (
+        !file
+    ) {
+
+        return null;
+
+    }
+
+
+    const compressed =
+        await compressImage(
+            file
+        );
+
+
+    const fileName =
+        "vin_"
+        + wineId
+        + ".jpg";
+
+
+    const metadata = {
+
+        name:
+            fileName,
+
+        mimeType:
+            "image/jpeg",
+
+        parents:
+            [googleFolderId]
+
+    };
+
+
+    const boundary =
+        "-------314159265358979323846";
+
+
+    const delimiter =
+        "\r\n--"
+        + boundary
+        + "\r\n";
+
+
+    const closeDelimiter =
+        "\r\n--"
+        + boundary
+        + "--";
+
+
+    const metadataPart =
+        delimiter
+        + "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        + JSON.stringify(
+            metadata
+        );
+
+
+    const imagePart =
+        delimiter
+        + "Content-Type: image/jpeg\r\n\r\n";
+
+
+    const body =
+        new Blob(
+            [
+
+                metadataPart,
+
+                imagePart,
+
+                compressed,
+
+                closeDelimiter
+
+            ],
+
+            {
+                type:
+                    "multipart/related; boundary="
+                    + boundary
+            }
+        );
+
+
+    const response =
+        await driveRequest(
+            "https://www.googleapis.com/upload/drive/v3/files"
+            + "?uploadType=multipart",
+
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "multipart/related; boundary="
+                        + boundary
+
+                },
+
+                body:
+                    body
+
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    return data.id;
+
+}
+
+
+/* =====================================================
    SCANNER VARIABLER
 ===================================================== */
 
@@ -742,7 +1704,7 @@ const REQUIRED_DETECTIONS = 2;
 
 
 /* =====================================================
-   OPSLAGSDATA
+   OPSLAGS DATA
 ===================================================== */
 
 let lookupWineData = null;
@@ -788,7 +1750,6 @@ function startScanner() {
 
     const config = {
 
-
         inputStream: {
 
             name: "Live",
@@ -799,7 +1760,6 @@ function startScanner() {
                 document.querySelector(
                     "#camera"
                 ),
-
 
             constraints: {
 
@@ -826,7 +1786,6 @@ function startScanner() {
 
             },
 
-
             area: {
 
                 top: "25%",
@@ -841,7 +1800,6 @@ function startScanner() {
 
         },
 
-
         locator: {
 
             patchSize: "medium",
@@ -850,9 +1808,7 @@ function startScanner() {
 
         },
 
-
         frequency: 15,
-
 
         decoder: {
 
@@ -863,12 +1819,9 @@ function startScanner() {
 
         },
 
-
         locate: true,
 
-
         numOfWorkers:
-
             navigator.hardwareConcurrency
             ? Math.min(
                 navigator.hardwareConcurrency,
@@ -905,7 +1858,8 @@ function startScanner() {
             Quagga.start();
 
 
-            scannerRunning = true;
+            scannerRunning =
+                true;
 
 
             document.getElementById(
@@ -929,7 +1883,9 @@ function startScanner() {
    STREGKODE FUNDET
 ===================================================== */
 
-function barcodeDetected(result) {
+function barcodeDetected(
+    result
+) {
 
 
     if (
@@ -937,7 +1893,9 @@ function barcodeDetected(result) {
         !result.codeResult ||
         !result.codeResult.code
     ) {
+
         return;
+
     }
 
 
@@ -953,19 +1911,27 @@ function barcodeDetected(result) {
         format !== "ean_13" &&
         format !== "ean_8"
     ) {
+
         return;
+
     }
 
 
-    if (code === lastCode) {
+    if (
+        code === lastCode
+    ) {
 
         detectionCount++;
 
-    } else {
+    }
 
-        lastCode = code;
+    else {
 
-        detectionCount = 1;
+        lastCode =
+            code;
+
+        detectionCount =
+            1;
 
     }
 
@@ -981,7 +1947,9 @@ function barcodeDetected(result) {
         REQUIRED_DETECTIONS
     ) {
 
-        finishScan(code);
+        finishScan(
+            code
+        );
 
     }
 
@@ -992,31 +1960,39 @@ function barcodeDetected(result) {
    AFSLUT SCANNING
 ===================================================== */
 
-function finishScan(code) {
+function finishScan(
+    code
+) {
 
 
     stopScanner();
 
 
-    lookupWineData = null;
+    lookupWineData =
+        null;
 
 
     document.getElementById(
         "barcode"
-    ).textContent = code;
+    ).textContent =
+        code;
 
 
     document.getElementById(
         "scannerPage"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 
     document.getElementById(
         "scanResult"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
 
-    lookupWine(code);
+    lookupWine(
+        code
+    );
 
 }
 
@@ -1028,8 +2004,12 @@ function finishScan(code) {
 function stopScanner() {
 
 
-    if (!scannerRunning) {
+    if (
+        !scannerRunning
+    ) {
+
         return;
+
     }
 
 
@@ -1043,14 +2023,19 @@ function stopScanner() {
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
-        console.log(error);
+        console.log(
+            error
+        );
 
     }
 
 
-    scannerRunning = false;
+    scannerRunning =
+        false;
 
 }
 
@@ -1067,17 +2052,20 @@ function closeScanner() {
 
     document.getElementById(
         "scannerPage"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 
     document.getElementById(
         "scanResult"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 
     document.getElementById(
         "homePage"
-    ).style.display = "block";
+    ).style.display =
+        "block";
 
 }
 
@@ -1089,12 +2077,14 @@ function closeScanner() {
 function scanAgain() {
 
 
-    lookupWineData = null;
+    lookupWineData =
+        null;
 
 
     document.getElementById(
         "scanResult"
-    ).style.display = "none";
+    ).style.display =
+        "none";
 
 
     startScanner();
@@ -1106,7 +2096,9 @@ function scanAgain() {
    AUTOMATISK VINOPSLAG
 ===================================================== */
 
-async function lookupWine(code) {
+async function lookupWine(
+    code
+) {
 
 
     const status =
@@ -1122,12 +2114,6 @@ async function lookupWine(code) {
     status.textContent =
         "🔎 Søger efter vin...";
 
-
-    /*
-       Vi bruger den aktuelle v3 API.
-
-       Kun nødvendige felter hentes.
-    */
 
     const fields = [
 
@@ -1148,12 +2134,16 @@ async function lookupWine(code) {
 
     const url =
         "https://world.openfoodfacts.org/api/v3/product/"
-        + encodeURIComponent(code)
+        + encodeURIComponent(
+            code
+        )
         + "?product_type=all"
         + "&lc=da"
         + "&cc=dk"
         + "&fields="
-        + encodeURIComponent(fields);
+        + encodeURIComponent(
+            fields
+        );
 
 
     console.log(
@@ -1169,7 +2159,8 @@ async function lookupWine(code) {
             await fetch(
                 url,
                 {
-                    method: "GET"
+                    method:
+                        "GET"
                 }
             );
 
@@ -1180,13 +2171,16 @@ async function lookupWine(code) {
         );
 
 
-        if (!response.ok) {
+        if (
+            !response.ok
+        ) {
 
             if (
                 response.status === 404
             ) {
 
-                lookupWineData = null;
+                lookupWineData =
+                    null;
 
 
                 status.className =
@@ -1205,8 +2199,8 @@ async function lookupWine(code) {
 
 
             throw new Error(
-                "HTTP " +
-                response.status
+                "HTTP "
+                + response.status
             );
 
         }
@@ -1222,11 +2216,6 @@ async function lookupWine(code) {
         );
 
 
-        /*
-           V3 bruger product-objektet,
-           og status kan være success.
-        */
-
         const product =
             data.product;
 
@@ -1235,7 +2224,8 @@ async function lookupWine(code) {
             !product
         ) {
 
-            lookupWineData = null;
+            lookupWineData =
+                null;
 
 
             status.className =
@@ -1252,13 +2242,6 @@ async function lookupWine(code) {
         }
 
 
-        /*
-           Hent navn.
-
-           Vi prioriterer dansk,
-           derefter almindeligt navn.
-        */
-
         const name =
 
             product.product_name_da
@@ -1272,27 +2255,17 @@ async function lookupWine(code) {
             "";
 
 
-        /*
-           Producent
-        */
-
         const producer =
-            product.brands || "";
+            product.brands
+            ||
+            "";
 
-
-        /*
-           Land
-        */
 
         const country =
             extractCountry(
                 product
             );
 
-
-        /*
-           Type
-        */
 
         const type =
             detectWineType(
@@ -1302,26 +2275,28 @@ async function lookupWine(code) {
 
         lookupWineData = {
 
-            name: name,
+            name:
+                name,
 
-            producer: producer,
+            producer:
+                producer,
 
-            country: country,
+            country:
+                country,
 
-            type: type
+            type:
+                type
 
         };
 
-
-        /*
-           Vis succes
-        */
 
         status.className =
             "lookupStatus lookupSuccess";
 
 
-        if (name) {
+        if (
+            name
+        ) {
 
             status.textContent =
                 "✅ Vin fundet: "
@@ -1329,7 +2304,9 @@ async function lookupWine(code) {
                 + ". Kontrollér oplysningerne "
                 + "før du gemmer.";
 
-        } else {
+        }
+
+        else {
 
             status.textContent =
                 "✅ Stregkoden blev fundet, "
@@ -1341,7 +2318,9 @@ async function lookupWine(code) {
 
     }
 
-    catch (error) {
+    catch (
+        error
+    ) {
 
 
         console.error(
@@ -1350,7 +2329,8 @@ async function lookupWine(code) {
         );
 
 
-        lookupWineData = null;
+        lookupWineData =
+            null;
 
 
         status.className =
@@ -1372,12 +2352,10 @@ async function lookupWine(code) {
    FIND LAND
 ===================================================== */
 
-function extractCountry(product) {
+function extractCountry(
+    product
+) {
 
-
-    /*
-       Først countries_tags
-    */
 
     if (
         Array.isArray(
@@ -1398,10 +2376,6 @@ function extractCountry(product) {
     }
 
 
-    /*
-       Derefter countries
-    */
-
     if (
         product.countries
     ) {
@@ -1412,10 +2386,6 @@ function extractCountry(product) {
 
     }
 
-
-    /*
-       Til sidst origins
-    */
 
     if (
         product.origins
@@ -1434,24 +2404,22 @@ function extractCountry(product) {
 
 
 /* =====================================================
-   RENS OPEN FOOD FACTS TAXONOMI
+   RENS TAXONOMI
 ===================================================== */
 
-function cleanTaxonomyValue(value) {
+function cleanTaxonomyValue(
+    value
+) {
 
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return "";
+
     }
 
-
-    /*
-       Eksempel:
-
-       en:france
-       da:frankrig
-       fr:france
-    */
 
     const parts =
         value.split(":");
@@ -1464,13 +2432,19 @@ function cleanTaxonomyValue(value) {
         return parts
             .slice(1)
             .join(":")
-            .replace(/-/g, " ");
+            .replace(
+                /-/g,
+                " "
+            );
 
     }
 
 
     return value
-        .replace(/-/g, " ");
+        .replace(
+            /-/g,
+            " "
+        );
 
 }
 
@@ -1479,14 +2453,17 @@ function cleanTaxonomyValue(value) {
    GENKENDEL VINTYPE
 ===================================================== */
 
-function detectWineType(product) {
+function detectWineType(
+    product
+) {
 
 
     const text = (
 
         (
             product.product_name
-            || ""
+            ||
+            ""
         )
 
         + " "
@@ -1495,7 +2472,8 @@ function detectWineType(product) {
 
         (
             product.product_name_da
-            || ""
+            ||
+            ""
         )
 
         + " "
@@ -1504,7 +2482,8 @@ function detectWineType(product) {
 
         (
             product.generic_name
-            || ""
+            ||
+            ""
         )
 
         + " "
@@ -1513,7 +2492,8 @@ function detectWineType(product) {
 
         (
             product.categories
-            || ""
+            ||
+            ""
         )
 
         + " "
@@ -1525,7 +2505,9 @@ function detectWineType(product) {
                 product.categories_tags
             )
             ?
-            product.categories_tags.join(" ")
+            product.categories_tags.join(
+                " "
+            )
             :
             ""
         )
@@ -1533,12 +2515,10 @@ function detectWineType(product) {
     ).toLowerCase();
 
 
-    /*
-       Champagne
-    */
-
     if (
-        text.includes("champagne")
+        text.includes(
+            "champagne"
+        )
     ) {
 
         return "Champagne";
@@ -1546,19 +2526,23 @@ function detectWineType(product) {
     }
 
 
-    /*
-       Portvin
-    */
-
     if (
 
-        text.includes("port wine")
+        text.includes(
+            "port wine"
+        )
         ||
-        text.includes("portwine")
+        text.includes(
+            "portwine"
+        )
         ||
-        text.includes("portvin")
+        text.includes(
+            "portvin"
+        )
         ||
-        text.includes("porto")
+        text.includes(
+            "porto"
+        )
 
     ) {
 
@@ -1567,25 +2551,35 @@ function detectWineType(product) {
     }
 
 
-    /*
-       Mousserende
-    */
-
     if (
 
-        text.includes("sparkling")
+        text.includes(
+            "sparkling"
+        )
         ||
-        text.includes("mousser")
+        text.includes(
+            "mousser"
+        )
         ||
-        text.includes("prosecco")
+        text.includes(
+            "prosecco"
+        )
         ||
-        text.includes("cava")
+        text.includes(
+            "cava"
+        )
         ||
-        text.includes("crémant")
+        text.includes(
+            "crémant"
+        )
         ||
-        text.includes("cremant")
+        text.includes(
+            "cremant"
+        )
         ||
-        text.includes("sekt")
+        text.includes(
+            "sekt"
+        )
 
     ) {
 
@@ -1594,31 +2588,47 @@ function detectWineType(product) {
     }
 
 
-    /*
-       Spiritus
-    */
-
     if (
 
-        text.includes("spirit")
+        text.includes(
+            "spirit"
+        )
         ||
-        text.includes("whisky")
+        text.includes(
+            "whisky"
+        )
         ||
-        text.includes("whiskey")
+        text.includes(
+            "whiskey"
+        )
         ||
-        text.includes("vodka")
+        text.includes(
+            "vodka"
+        )
         ||
-        text.includes("gin")
+        text.includes(
+            "gin"
+        )
         ||
-        text.includes("rum")
+        text.includes(
+            "rum"
+        )
         ||
-        text.includes("brandy")
+        text.includes(
+            "brandy"
+        )
         ||
-        text.includes("cognac")
+        text.includes(
+            "cognac"
+        )
         ||
-        text.includes("liqueur")
+        text.includes(
+            "liqueur"
+        )
         ||
-        text.includes("likør")
+        text.includes(
+            "likør"
+        )
 
     ) {
 
@@ -1627,25 +2637,35 @@ function detectWineType(product) {
     }
 
 
-    /*
-       Hvidvin
-    */
-
     if (
 
-        text.includes("white wine")
+        text.includes(
+            "white wine"
+        )
         ||
-        text.includes("white-wine")
+        text.includes(
+            "white-wine"
+        )
         ||
-        text.includes("hvidvin")
+        text.includes(
+            "hvidvin"
+        )
         ||
-        text.includes("vino bianco")
+        text.includes(
+            "vino bianco"
+        )
         ||
-        text.includes("vin blanc")
+        text.includes(
+            "vin blanc"
+        )
         ||
-        text.includes("weisswein")
+        text.includes(
+            "weisswein"
+        )
         ||
-        text.includes("weißwein")
+        text.includes(
+            "weißwein"
+        )
 
     ) {
 
@@ -1654,23 +2674,31 @@ function detectWineType(product) {
     }
 
 
-    /*
-       Rødvin
-    */
-
     if (
 
-        text.includes("red wine")
+        text.includes(
+            "red wine"
+        )
         ||
-        text.includes("red-wine")
+        text.includes(
+            "red-wine"
+        )
         ||
-        text.includes("rødvin")
+        text.includes(
+            "rødvin"
+        )
         ||
-        text.includes("vino rosso")
+        text.includes(
+            "vino rosso"
+        )
         ||
-        text.includes("vin rouge")
+        text.includes(
+            "vin rouge"
+        )
         ||
-        text.includes("rotwein")
+        text.includes(
+            "rotwein"
+        )
 
     ) {
 
@@ -1678,10 +2706,6 @@ function detectWineType(product) {
 
     }
 
-
-    /*
-       Hvis vi ikke kan bestemme typen
-    */
 
     return "Rødvin";
 
@@ -1733,15 +2757,18 @@ function resetWineForm() {
 
 
             if (
-                input.type === "file"
+                input.type ===
+                "file"
             ) {
 
-                input.value = "";
+                input.value =
+                    "";
 
             }
 
             else if (
-                input.type === "number"
+                input.type ===
+                "number"
             ) {
 
 
@@ -1750,13 +2777,15 @@ function resetWineForm() {
                     "wineQuantity"
                 ) {
 
-                    input.value = "1";
+                    input.value =
+                        "1";
 
                 }
 
                 else {
 
-                    input.value = "";
+                    input.value =
+                        "";
 
                 }
 
@@ -1764,7 +2793,8 @@ function resetWineForm() {
 
             else {
 
-                input.value = "";
+                input.value =
+                    "";
 
             }
 
@@ -1774,12 +2804,14 @@ function resetWineForm() {
 
     document.getElementById(
         "wineType"
-    ).selectedIndex = 0;
+    ).selectedIndex =
+        0;
 
 
     document.getElementById(
         "wineNotes"
-    ).value = "";
+    ).value =
+        "";
 
 
     const preview =
@@ -1799,7 +2831,8 @@ function resetWineForm() {
 
     document.getElementById(
         "winePhoto"
-    ).value = "";
+    ).value =
+        "";
 
 
     const formStatus =
@@ -1859,11 +2892,9 @@ function showAddForm(
     resetWineForm();
 
 
-    /*
-       Stregkode
-    */
-
-    if (code) {
+    if (
+        code
+    ) {
 
         document.getElementById(
             "wineBarcode"
@@ -1873,35 +2904,41 @@ function showAddForm(
     }
 
 
-    /*
-       Automatisk fundne data
-    */
-
-    if (wineData) {
+    if (
+        wineData
+    ) {
 
 
         document.getElementById(
             "wineName"
         ).value =
-            wineData.name || "";
+            wineData.name
+            ||
+            "";
 
 
         document.getElementById(
             "wineProducer"
         ).value =
-            wineData.producer || "";
+            wineData.producer
+            ||
+            "";
 
 
         document.getElementById(
             "wineCountry"
         ).value =
-            wineData.country || "";
+            wineData.country
+            ||
+            "";
 
 
         document.getElementById(
             "wineType"
         ).value =
-            wineData.type || "Rødvin";
+            wineData.type
+            ||
+            "Rødvin";
 
 
         const status =
@@ -1931,15 +2968,21 @@ function showAddForm(
    FOTO PREVIEW
 ===================================================== */
 
-function previewPhoto(event) {
+function previewPhoto(
+    event
+) {
 
 
     const file =
         event.target.files[0];
 
 
-    if (!file) {
+    if (
+        !file
+    ) {
+
         return;
+
     }
 
 
@@ -1965,10 +3008,13 @@ function previewPhoto(event) {
    GEM VIN
 ===================================================== */
 
-function saveWine() {
+async function saveWine() {
 
 
     const wine = {
+
+        id:
+            Date.now().toString(),
 
         barcode:
             document.getElementById(
@@ -2013,31 +3059,194 @@ function saveWine() {
         notes:
             document.getElementById(
                 "wineNotes"
-            ).value
+            ).value,
+
+        photoFileId:
+            null,
+
+        dateAdded:
+            new Date().toISOString()
 
     };
 
 
+    const photoInput =
+        document.getElementById(
+            "winePhoto"
+        );
+
+
+    const photoFile =
+        photoInput.files[0]
+        ||
+        null;
+
+
     /*
-       Midlertidig testlagring.
-       OneDrive kommer senere.
+       Lokal backup.
     */
 
     localStorage.setItem(
         "testWine",
-        JSON.stringify(wine)
+        JSON.stringify(
+            wine
+        )
     );
 
 
-    alert(
-        "Vinen er gemt midlertidigt."
-    );
+    /*
+       Hvis Google ikke er
+       logget ind, gem lokalt.
+    */
+
+    if (
+        !googleAccessToken
+    ) {
+
+        alert(
+            "Vinen er gemt lokalt.\n\n"
+            + "Log ind med Google Drive "
+            + "for at gemme den i dit "
+            + "Google Drive."
+        );
 
 
-    resetWineForm();
+        resetWineForm();
+
+        showHome();
+
+        return;
+
+    }
 
 
-    showHome();
+    try {
+
+
+        /*
+           Sørg for at mappen findes.
+        */
+
+        await getOrCreateWineFolder();
+
+
+        /*
+           Upload billede først.
+        */
+
+        if (
+            photoFile
+        ) {
+
+            document.getElementById(
+                "formLookupStatus"
+            ).style.display =
+                "block";
+
+
+            document.getElementById(
+                "formLookupStatus"
+            ).className =
+                "lookupStatus";
+
+
+            document.getElementById(
+                "formLookupStatus"
+            ).textContent =
+                "☁️ Gemmer billede…";
+
+
+            wine.photoFileId =
+                await uploadWinePhoto(
+                    photoFile,
+                    wine.id
+                );
+
+        }
+
+
+        /*
+           Hent eksisterende vine.
+        */
+
+        let wines =
+            await loadWinesFromDrive();
+
+
+        if (
+            !Array.isArray(
+                wines
+            )
+        ) {
+
+            wines =
+                [];
+
+        }
+
+
+        wines.push(
+            wine
+        );
+
+
+        /*
+           Gem samlet lager.
+        */
+
+        document.getElementById(
+            "formLookupStatus"
+        ).textContent =
+            "☁️ Gemmer vinlager…";
+
+
+        await saveWinesToDrive(
+            wines
+        );
+
+
+        alert(
+            "✅ Vinen er gemt i Google Drive."
+        );
+
+
+        resetWineForm();
+
+        showHome();
+
+
+    }
+
+    catch (
+        error
+    ) {
+
+
+        console.error(
+            "Google Drive fejl:",
+            error
+        );
+
+
+        /*
+           Vinen er stadig gemt lokalt.
+        */
+
+        alert(
+            "⚠️ Der opstod en fejl ved "
+            + "gemning til Google Drive.\n\n"
+            + "Vinen er gemt lokalt på "
+            + "telefonen.\n\n"
+            + "Fejl: "
+            + error.message
+        );
+
+
+        resetWineForm();
+
+        showHome();
+
+    }
 
 }
 
@@ -2087,3 +3296,4 @@ function showHome() {
 </body>
 
 </html>
+```
